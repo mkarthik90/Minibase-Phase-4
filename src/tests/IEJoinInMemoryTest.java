@@ -258,7 +258,7 @@ public class IEJoinInMemoryTest
 	public static void main(String argv[])
 	{
 
-		String query = "queries/query_2c.txt", dataset1 = "Dataset/10Thousand", dataset2 = "";
+		String query = "queries/p3/query_1b.txt", dataset1 = "Dataset/10Thousand";
 		try {
 			DBBuilder.build(dataset1);
 			System.out.printf("Query: %s\n", query);
