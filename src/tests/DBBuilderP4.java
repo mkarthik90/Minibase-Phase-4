@@ -139,6 +139,11 @@ class TableEntry5 {
 		rel3 = _r3;
 	}
 }
+
+
+
+
+
 public class DBBuilderP4 implements GlobalConst{
 	private static ArrayList<TableEntry1> RTable1;
 	private static ArrayList<TableEntry2> RTable2;
@@ -146,12 +151,13 @@ public class DBBuilderP4 implements GlobalConst{
 	private static ArrayList<TableEntry4> RTable4;
 	private static ArrayList<TableEntry5> RTable5;
 	
-	public static void build(){
+	public static Histogram[] build(){
 		RTable1 = new ArrayList<TableEntry1>();
 		RTable2 = new ArrayList<TableEntry2>();
 		RTable3 = new ArrayList<TableEntry3>();
 		RTable4 = new ArrayList<TableEntry4>();
 		RTable5 = new ArrayList<TableEntry5>();
+		Histogram hist[] = new Histogram[5];
 		String fndb = "datasetsPhase4/";
 		String fn1 = "F1";
 		String fn2 = "F2";
@@ -172,6 +178,8 @@ public class DBBuilderP4 implements GlobalConst{
 		TableEntry3 te3;
 		TableEntry4 te4;
 		TableEntry5 te5;
+		
+		//read files=====================================================================================================
 		//F1----------------------------------------------------------------------
 		try{
 			FileReader fr = new FileReader(fndb + fn1 + ".csv");
@@ -584,5 +592,20 @@ public class DBBuilderP4 implements GlobalConst{
 				e.printStackTrace();
 			}      
 		}
+		
+		//create histograms====================================================================================
+		hist[0] = new Histogram(RTable1.size(), 4);
+		hist[1] = new Histogram(RTable2.size(), 7);
+		hist[2] = new Histogram(RTable3.size(), 7);
+		hist[3] = new Histogram(RTable4.size(), 7);
+		hist[4] = new Histogram(RTable5.size(), 3);
+
+		hist[0].build_hist(RTable1, 1);
+		hist[1].build_hist(RTable2, 2);
+		hist[2].build_hist(RTable3, 3);
+		hist[3].build_hist(RTable4, 4);
+		hist[4].build_hist(RTable5, 5);
+		
+		return hist;
 	}
 }
