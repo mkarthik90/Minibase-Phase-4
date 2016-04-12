@@ -416,7 +416,7 @@ public class Histogram {
 	{
 		if(col <= numcol && col > 0)
 		{
-			return intervals[col + 1];
+			return intervals[col - 1];
 		}
 		return null;
 	}
