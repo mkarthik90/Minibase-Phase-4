@@ -339,7 +339,7 @@ public class IEJoinEstimator extends Iterator{
 		}
 	}
 
-	public void getResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
+	public int getResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
 		Tuple l1 = null, l1Prime = null, outTuple;
 		int off2, off1, k;
 		//List<Tuple> result = new ArrayList<Tuple>();
@@ -431,8 +431,7 @@ public class IEJoinEstimator extends Iterator{
 			}
 		}
 
-		System.out.println("Number of tuples: " + numTuples);
-		//return result;
+		return numTuples;
 	}
 
 	@Override
