@@ -1522,7 +1522,7 @@ public class DBBuilderP4 implements GlobalConst{
 	}
 	
 	
-	public static void make_new_heap(String fn)
+	public static Heapfile make_new_heap(String fn)
 	{
 		String dbpath = "/tmp/"+System.getProperty("user.name")+".minibase.jointestdb"; 
 		String logpath = "/tmp/"+System.getProperty("user.name")+".joinlog";
@@ -1541,19 +1541,13 @@ public class DBBuilderP4 implements GlobalConst{
 			System.err.println (""+e);
 		}
 
-		short [] Ssizes = null;
-
 		Tuple t = new Tuple();
 
-		try {
-			t.setHdr((short) 4, TableEntry1.at, Ssizes);
+		try{
+			Runtime.getRuntime().exec("rm " + fn + ".in");
 		}
-		catch (Exception e) {
-			System.err.println("*** error in Tuple.setHdr() ***");
-			e.printStackTrace();
-		}
-
-		int size = t.size();
+		catch(Exception e)
+		{}
 
 		Heapfile        f = null;
 		try {
@@ -1563,14 +1557,7 @@ public class DBBuilderP4 implements GlobalConst{
 			System.err.println("*** error in Heapfile constructor ***");
 			e.printStackTrace();
 		}
-
-		t = new Tuple(size);
-		try {
-			t.setHdr((short) 4, TableEntry1.at, Ssizes);
-		}
-		catch (Exception e) {
-			System.err.println("*** error in Tuple.setHdr() ***");
-			e.printStackTrace();
-		}
+		
+		return f;
 	}
 }
