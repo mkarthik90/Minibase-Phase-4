@@ -48,7 +48,7 @@ public class DBBuilder implements GlobalConst{
 		TableEntry te;
 		//R----------------------------------------------------------------------
 		try{
-			FileReader fr = new FileReader("R.txt");
+			FileReader fr = new FileReader("R_4.txt");
 			BufferedReader bufferedReader = new BufferedReader(fr);
 			line = bufferedReader.readLine();
 			while((line = bufferedReader.readLine()) != null) 
@@ -97,7 +97,7 @@ public class DBBuilder implements GlobalConst{
 		}
 		//S-------------------------------------------------------------------
 		try{
-			FileReader fr = new FileReader("S.txt");
+			FileReader fr = new FileReader("S_4.txt");
 			BufferedReader bufferedReader = new BufferedReader(fr);
 			line = bufferedReader.readLine();
 			while((line = bufferedReader.readLine()) != null) 

@@ -75,9 +75,6 @@ public class IEJoinInMemory extends Iterator{
 			_values = new HashMap<IEJoinInMemoryArrayType, List<Tuple>>();
 			_populateValues(r1, r2);
 			_sortValues(r1c1, r2c1, r1c2, r2c2, op1, op2);
-
-			//_print();
-			//System.exit(0);
 		}
 
 		private void _print(){
@@ -197,6 +194,18 @@ public class IEJoinInMemory extends Iterator{
 		public Tuple getFromL2Prime(int idx){
 			return _get(IEJoinInMemoryArrayType.L2Prime, idx);
 		}
+		
+		public int getL2PrimeSize(){
+			return _getSize(IEJoinInMemoryArrayType.L2Prime);
+		}
+
+		public int getL2Size(){
+			return _getSize(IEJoinInMemoryArrayType.L2);
+		}
+		
+		private int _getSize(IEJoinInMemoryArrayType type){
+			return _values.get(type).size();
+		}
 
 		private Tuple _get(IEJoinInMemoryArrayType type, int idx){
 			return _values.get(type).get(idx);
@@ -245,13 +254,13 @@ public class IEJoinInMemory extends Iterator{
 
 		//line 9
 
-		l1Offset = new int[Math.min(m, n)];
-		l2Offset = new int[Math.min(m, n)];
+		l1Offset = new int[m];
+		l2Offset = new int[m];
 		boolean found;
 
 		int l1PrimeVal, l1Val;
 
-		for(int i = 0; i < Math.min(m, n); i++){
+		for(int i = 0; i < m; i++){
 			found = false;
 			l1 = _elements.getFromL1(i);
 			l1Val = l1.getIntFld(r1c1);
@@ -285,7 +294,7 @@ public class IEJoinInMemory extends Iterator{
 		//line 10
 		int l2PrimeVal, l2Val;
 
-		for(int i = 0; i < Math.min(m, n); i++){
+		for(int i = 0; i < m; i++){
 			found = false;
 			l2 = _elements.getFromL2(i);
 			l2Val = l2.getIntFld(r1c2);
@@ -326,18 +335,8 @@ public class IEJoinInMemory extends Iterator{
 			eqOff = 0;
 		}
 		else{
-			eqOff = 1;
+			eqOff = 0;
 		}
-
-		/*
-		System.out.println("===================");
-		System.out.println("PrimePermArr:");
-		System.out.println(Arrays.toString(primePermArr));
-
-		System.out.println("PermArr:");
-		System.out.println(Arrays.toString(permArr));
-		System.out.println("===================");
-		 */
 	}
 
 	public void getResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
@@ -376,7 +375,7 @@ public class IEJoinInMemory extends Iterator{
 		projMat.toArray(permMat);
 		int numTuples = 0;
 
-		for(int i = 0; i < m; i++){
+		for(int i = 0; i < l2Offset.length; i++){
 
 			off2 = l2Offset[i];
 

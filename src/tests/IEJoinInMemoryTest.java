@@ -56,19 +56,7 @@ class IEJoinInMemoryQuery{
 
 	public void runQuery() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
 		IEJoinInMemory join = new IEJoinInMemory(_r1, _r2, _r1c1, _r2c1, _r1c2, _r2c2, _op1, _op2, _projRels);
-		//List<Tuple> results = join.getResult();
 		join.getResult();
-
-		/*
-		try{
-			for(Tuple tuple : results){
-				tuple.print(_attrTypes);
-			}
-		}
-		catch(Exception ex){
-			ex.printStackTrace();
-		}
-		 */
 	}
 }
 
@@ -83,7 +71,6 @@ class IEJoinInMemoryDriver implements GlobalConst {
 	}
 
 	public static void queryFromFile(String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
-	//	BufMgr.numPagesUsed = 0;
 		if(parseQuery(filename)){
 			_query.runQuery();
 		}
@@ -108,19 +95,22 @@ class IEJoinInMemoryDriver implements GlobalConst {
 	public static void query2c() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
 		queryFromFile("queries/query_2c.txt");
 	}
+	
+	public static void query2c_1() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
+		queryFromFile("queries/p3/query_2c_1.txt");
+	}
 
+	public static void query2c_2() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
+		queryFromFile("queries/p3/query_2c_2.txt");
+	}
+	
 	public static boolean runTests() {
 		try {
-			System.out.println("Query 1a");
 			//query1a();
-			System.out.println("Query 1b");
 			//query1b();
-			System.out.println("Query 2a");
 			//query2a();
-			System.out.println("Query 2b");
 			//query2b();
-			System.out.println("Query 2c");
-			query2c();
+			query2c_1();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -258,31 +248,17 @@ public class IEJoinInMemoryTest
 	public static void main(String argv[])
 	{
 
-		String query = "queries/p3/query_1b.txt", dataset1 = "Dataset/10Thousand";
-		try {
-			DBBuilder.build(dataset1);
-			System.out.printf("Query: %s\n", query);
-			System.out.printf("Dataset: %s\n", dataset1);
-			long start = System.nanoTime();
-			IEJoinInMemoryDriver.queryFromFile(query);
-			long end = System.nanoTime();
-			long memory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-			
-			System.out.printf("Time in nanos: %d\n", end - start);
-			System.out.printf("Memory: %d\n", memory);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		DBBuilder.build();
 
-		/*
-		if (sortstatus != true) {
-			System.out.println("Error ocurred during join tests");
-		}
-		else {
-			System.out.println("join tests completed successfully");
-		}
-		 */
+		Map<String, Set<Integer>> projRels = new LinkedHashMap<String, Set<Integer>>();
+		projRels.put("R", new LinkedHashSet<Integer>());
+		projRels.get("R").add(1);
+
+		projRels.put("S", new LinkedHashSet<Integer>());
+		projRels.get("S").add(1);
+
+		boolean sortstatus = IEJoinInMemoryDriver.runTests();
+
 	}
 }
 

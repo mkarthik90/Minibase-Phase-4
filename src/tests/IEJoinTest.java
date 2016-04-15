@@ -88,23 +88,31 @@ class IEJoinsDriver implements GlobalConst {
 	}
 	
 	public static void query1a() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
-		queryFromFile("queries/query_1a.txt");
+		queryFromFile("queries/p3/query_1a.txt");
 	}
 
 	public static void query1b() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
-		queryFromFile("queries/query_1b.txt");
+		queryFromFile("queries/p3/query_1b.txt");
 	}
 
 	public static void query2a() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
-		queryFromFile("queries/query_2a.txt");
+		queryFromFile("queries/p3/query_2a.txt");
 	}
 
 	public static void query2b() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
-		queryFromFile("queries/query_2b.txt");
+		queryFromFile("queries/p3/query_2b.txt");
 	}
 
 	public static void query2c() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
-		queryFromFile("queries/query_2c.txt");
+		queryFromFile("queries/p3/query_2c.txt");
+	}
+
+	public static void query2c_1() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
+		queryFromFile("queries/p3/query_2c_1.txt");
+	}
+
+	public static void query2c_2() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
+		queryFromFile("queries/p3/query_2c_2.txt");
 	}
 
 	public static boolean runTests() {
@@ -113,7 +121,7 @@ class IEJoinsDriver implements GlobalConst {
 			//query1b();
 			//query2a();
 			//query2b();
-			query2c();
+			query2c_1();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -256,28 +264,10 @@ public class IEJoinTest
 		projRels.put("R", new LinkedHashSet<Integer>());
 		projRels.get("R").add(1);
 
-
 		projRels.put("S", new LinkedHashSet<Integer>());
 		projRels.get("S").add(1);
 
-		//IEJoinQuery query = new IEJoinQuery("R", "S", 1, 1, 2, 2, AttrOperator.aopGT, AttrOperator.aopGT, projRels);;
-		
-		try {
-		//	query.runQuery();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		boolean sortstatus = IEJoinsDriver.runTests();
-
-		/*
-		if (sortstatus != true) {
-			System.out.println("Error ocurred during join tests");
-		}
-		else {
-			System.out.println("join tests completed successfully");
-		}
-		*/
 	}
 }
 

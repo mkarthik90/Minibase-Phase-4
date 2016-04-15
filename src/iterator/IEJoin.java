@@ -157,14 +157,14 @@ public class IEJoin extends Iterator{
 
 		//line 9
 
-		l1Offset = new int[Math.min(m, n)];
-		l2Offset = new int[Math.min(m, n)];
+		l1Offset = new int[m];
+		l2Offset = new int[m];
 		boolean found;
 
 		int l1PrimeVal, l1Val;
 		l1It_temp = (Iterator)l1It.clone();
 
-		for(int i = 0; i < Math.min(m, n); i++){
+		for(int i = 0; i < m; i++){
 			found = false;
 			l1 = l1It_temp.get_next();
 			l1Val = l1.getIntFld(r1c1);
@@ -201,7 +201,7 @@ public class IEJoin extends Iterator{
 		int l2PrimeVal, l2Val;
 		l2It_temp = (Iterator)l2It.clone();
 
-		for(int i = 0; i < Math.min(m, n); i++){
+		for(int i = 0; i < m; i++){
 			found = false;
 			l2 = l2It_temp.get_next();
 			l2Val = l2.getIntFld(r1c2);
