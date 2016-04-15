@@ -152,7 +152,7 @@ public class DBBuilderP4 implements GlobalConst{
 	private static ArrayList<TableEntry5> RTable5;
 	
 	
-	public static void build()
+	public static Histogram[] build_sample()
 	{
 
 		RTable1 = new ArrayList<TableEntry1>();
@@ -595,9 +595,24 @@ public class DBBuilderP4 implements GlobalConst{
 				e.printStackTrace();
 			}      
 		}
+
+		//create histograms====================================================================================
+		hist[0] = new Histogram(RTable1.size(), 4, Histogram.SAMPLE);
+		hist[1] = new Histogram(RTable2.size(), 7, Histogram.SAMPLE);
+		hist[2] = new Histogram(RTable3.size(), 7, Histogram.SAMPLE);
+		hist[3] = new Histogram(RTable4.size(), 7, Histogram.SAMPLE);
+		hist[4] = new Histogram(RTable5.size(), 3, Histogram.SAMPLE);
+
+		hist[0].build_sample_hist(RTable1, 1);
+		hist[1].build_sample_hist(RTable2, 2);
+		hist[2].build_sample_hist(RTable3, 3);
+		hist[3].build_sample_hist(RTable4, 4);
+		hist[4].build_sample_hist(RTable5, 5);
+		
+		return hist;
 	}
 	
-	public static Histogram[] build_hist(){
+	public static Histogram[] build_sorted(){
 		RTable1 = new ArrayList<TableEntry1>();
 		RTable2 = new ArrayList<TableEntry2>();
 		RTable3 = new ArrayList<TableEntry3>();
@@ -1040,17 +1055,17 @@ public class DBBuilderP4 implements GlobalConst{
 		}
 		
 		//create histograms====================================================================================
-		hist[0] = new Histogram(RTable1.size(), 4);
-		hist[1] = new Histogram(RTable2.size(), 7);
-		hist[2] = new Histogram(RTable3.size(), 7);
-		hist[3] = new Histogram(RTable4.size(), 7);
-		hist[4] = new Histogram(RTable5.size(), 3);
+		hist[0] = new Histogram(RTable1.size(), 4, Histogram.SORTED);
+		hist[1] = new Histogram(RTable2.size(), 7, Histogram.SORTED);
+		hist[2] = new Histogram(RTable3.size(), 7, Histogram.SORTED);
+		hist[3] = new Histogram(RTable4.size(), 7, Histogram.SORTED);
+		hist[4] = new Histogram(RTable5.size(), 3, Histogram.SORTED);
 
-		hist[0].build_hist(RTable1, 1);
-		hist[1].build_hist(RTable2, 2);
-		hist[2].build_hist(RTable3, 3);
-		hist[3].build_hist(RTable4, 4);
-		hist[4].build_hist(RTable5, 5);
+		hist[0].build_sorted_hist(RTable1, 1);
+		hist[1].build_sorted_hist(RTable2, 2);
+		hist[2].build_sorted_hist(RTable3, 3);
+		hist[3].build_sorted_hist(RTable4, 4);
+		hist[4].build_sorted_hist(RTable5, 5);
 		
 		return hist;
 	}
