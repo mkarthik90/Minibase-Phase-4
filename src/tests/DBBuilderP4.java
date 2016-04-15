@@ -150,6 +150,11 @@ public class DBBuilderP4 implements GlobalConst{
 	private static ArrayList<TableEntry3> RTable3;
 	private static ArrayList<TableEntry4> RTable4;
 	private static ArrayList<TableEntry5> RTable5;
+	private static final String fn1 = "F1r";
+	private static final String fn2 = "F2r";
+	private static final String fn3 = "F3r";
+	private static final String fn4 = "F4r";
+	private static final String fn5 = "F5r";
 	
 	
 	public static int[] build()
@@ -161,11 +166,6 @@ public class DBBuilderP4 implements GlobalConst{
 		RTable5 = new ArrayList<TableEntry5>();
 		Histogram hist[] = new Histogram[5];
 		String fndb = "datasetsPhase4/";
-		String fn1 = "F1";
-		String fn2 = "F2";
-		String fn3 = "F3";
-		String fn4 = "F4";
-		String fn5 = "F5";
 		String line;
 		String parts[];
 		int r1 = 0;
@@ -613,11 +613,6 @@ public class DBBuilderP4 implements GlobalConst{
 		RTable5 = new ArrayList<TableEntry5>();
 		Histogram hist[] = new Histogram[5];
 		String fndb = "datasetsPhase4/";
-		String fn1 = "F1";
-		String fn2 = "F2";
-		String fn3 = "F3";
-		String fn4 = "F4";
-		String fn5 = "F5";
 		String line;
 		String parts[];
 		int r1 = 0;
@@ -1071,11 +1066,6 @@ public class DBBuilderP4 implements GlobalConst{
 		RTable5 = new ArrayList<TableEntry5>();
 		Histogram hist[] = new Histogram[5];
 		String fndb = "datasetsPhase4/";
-		String fn1 = "F1";
-		String fn2 = "F2";
-		String fn3 = "F3";
-		String fn4 = "F4";
-		String fn5 = "F5";
 		String line;
 		String parts[];
 		int r1 = 0;
