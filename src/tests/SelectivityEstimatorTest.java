@@ -260,7 +260,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 public class SelectivityEstimatorTest {
 	public static void main(String argv[]) {
 
-		//DBBuilderP4.build();
+		DBBuilderP4.build();
 		
 		Map<String, Set<Integer>> projRels = new LinkedHashMap<String, Set<Integer>>();
 		projRels.put("R", new LinkedHashSet<Integer>());
