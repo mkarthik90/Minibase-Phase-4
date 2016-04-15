@@ -20,9 +20,9 @@ public abstract class QueryParser {
 		Query query = new Query();
 		File file = new File(filepath);
 		Scanner scan = new Scanner(file);
-		int lineNo = 0;
+		int lineNo = 0, col;
 		AttrOperator op;
-		String line, col, table, leftOp, rightOp;
+		String line, table, leftOp, rightOp;
 		String[] spaceParts, _parts;
 
 		while(scan.hasNextLine()){
@@ -38,7 +38,7 @@ public abstract class QueryParser {
 						_parts = part.split("_");
 
 						table = _parts[0];
-						col = _parts[1];
+						col = Integer.parseInt(_parts[1]);
 
 						query.addSelect(table, col);
 					}

@@ -24,7 +24,7 @@ public class Query {
 		count = true;
 	}
 
-	public void addSelect(String table, String col){
+	public void addSelect(String table, int col){
 		if(!count){
 			select.add(new QueryRel(table, col));
 		}
@@ -38,12 +38,13 @@ public class Query {
 	}
 
 	public void addWhere(String rel1, AttrOperator op, String rel2){
-		String t1, c1, t2, c2;
+		String t1, t2;
+		int c1, c2;
 
 		t1 = rel1.split("_")[0];
-		c1 = rel1.split("_")[1];
+		c1 = Integer.parseInt(rel1.split("_")[1]);
 		t2 = rel2.split("_")[0];
-		c2 = rel2.split("_")[1];
+		c2 = Integer.parseInt(rel2.split("_")[1]);
 
 		addWhere(new QueryRel(t1, c1), op, new QueryRel(t2, c2));
 	}

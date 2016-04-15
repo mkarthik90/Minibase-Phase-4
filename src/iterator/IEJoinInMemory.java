@@ -214,7 +214,32 @@ public class IEJoinInMemory extends Iterator{
 		}
 	}
 
-	public IEJoinInMemory(QueryPred pred1, QueryPred pred2){
+	public static IEJoinInMemory fromPred(QueryPred pred1, QueryPred pred2, Map<String, Set<Integer>> projRels) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
+		String r1, r2;
+		int r1c1, r1c2, r2c1, r2c2, op1, op2;
+
+		op1 = pred1.op.attrOperator;
+		op2 = pred2.op.attrOperator;
+
+		r1 = pred1.leftRel.table;
+		r2 = pred1.rightRel.table;
+
+		r1c1 = pred1.leftRel.col;
+		r2c1 = pred1.rightRel.col;
+		
+		/*
+		 * Check to see if order of tables is reversed in second predicate!
+		 */
+		if(pred2.leftRel.table.equals(r1)){
+			r1c2 = pred2.leftRel.col;
+			r2c2 = pred2.rightRel.col;
+		}
+		else{
+			r1c2 = pred2.rightRel.col;
+			r2c2 = pred2.leftRel.col;
+		}
+		
+		return new IEJoinInMemory(r1, r2, r1c1, r2c1, r1c2, r2c2, op1, op2, projRels);
 	}
 
 	public IEJoinInMemory(String r1, String r2, int r1c1, int r2c1, int r1c2, int r2c2, int op1, int op2, Map<String, Set<Integer>> projRels) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
@@ -343,6 +368,8 @@ public class IEJoinInMemory extends Iterator{
 			eqOff = 0;
 		}
 	}
+
+
 
 	public void getResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
 		Tuple l1 = null, l1Prime = null, outTuple;
