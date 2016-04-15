@@ -1560,4 +1560,11 @@ public class DBBuilderP4 implements GlobalConst{
 		
 		return f;
 	}
+	
+	public static void insert_tuple(Heapfile f, Tuple t)
+	{
+		try
+		{f.insertRecord(t.returnTupleByteArray());}
+		catch(Exception e){}
+	}
 }
