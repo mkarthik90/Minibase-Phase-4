@@ -2,6 +2,19 @@ package tests;
 
 //originally from : joins.C
 
+import global.AttrOperator;
+import global.AttrType;
+import global.GlobalConst;
+import heap.InvalidTupleSizeException;
+import heap.InvalidTypeException;
+import index.IndexException;
+import iterator.IEJoinEstimator;
+import iterator.JoinsException;
+import iterator.LowMemException;
+import iterator.PredEvalException;
+import iterator.UnknowAttrType;
+import iterator.UnknownKeyTypeException;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedHashMap;
@@ -10,30 +23,18 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import bufmgr.BufMgr;
 import bufmgr.PageNotReadException;
-import global.AttrOperator;
-import global.AttrType;
-import global.GlobalConst;
-import heap.InvalidTupleSizeException;
-import heap.InvalidTypeException;
-import index.IndexException;
-import iterator.IEJoinInMemory;
-import iterator.JoinsException;
-import iterator.LowMemException;
-import iterator.PredEvalException;
-import iterator.UnknowAttrType;
-import iterator.UnknownKeyTypeException;
 
 class IEJoinInMemoryQuerySelectivityEstimator {
 	private static String _r1, _r2;
 	private static Map<String, Set<Integer>> _projRels;
 	private static int _r1c1, _r1c2, _r2c1, _r2c2, _op1, _op2;
 	private static AttrType[] _attrTypes;
+	private static int _table1Size = 0, _table2Size = 0;
 
 	public IEJoinInMemoryQuerySelectivityEstimator(String r1, String r2,
 			int r1c1, int r2c1, int r1c2, int r2c2, int op1, int op2,
-			Map<String, Set<Integer>> projRels) {
+			Map<String, Set<Integer>> projRels, int table1Size, int table2Size) {
 		_r1 = r1;
 		_r2 = r2;
 		_r1c1 = r1c1;
@@ -43,6 +44,8 @@ class IEJoinInMemoryQuerySelectivityEstimator {
 		_op1 = op1;
 		_op2 = op2;
 		_projRels = projRels;
+		_table1Size = table1Size;
+		_table2Size = table2Size;
 
 		int tempSize = 0;
 
@@ -61,8 +64,8 @@ class IEJoinInMemoryQuerySelectivityEstimator {
 			InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, LowMemException,
 			UnknowAttrType, UnknownKeyTypeException, Exception {
-		IEJoinInMemory join = new IEJoinInMemory(_r1, _r2, _r1c1, _r2c1, _r1c2,
-				_r2c2, _op1, _op2, _projRels);
+		IEJoinEstimator join = new IEJoinEstimator(_r1, _r2, _r1c1, _r2c1, _r1c2,
+				_r2c2, _op1, _op2, _projRels,0,0);
 		join.getResult();
 	}
 }
@@ -73,24 +76,11 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 	private IEJoinInMemorySelectivityEstimate() {
 	}
 
-	public static void query(String r1, String r2, int r1c1, int r2c1,
-			int r1c2, int r2c2, int op1, int op2,
-			Map<String, Set<Integer>> projRels) throws JoinsException,
-			IndexException, InvalidTupleSizeException, InvalidTypeException,
-			PageNotReadException, PredEvalException, LowMemException,
-			UnknowAttrType, UnknownKeyTypeException, Exception {
-		IEJoinInMemoryQuerySelectivityEstimator tempQuery = new IEJoinInMemoryQuerySelectivityEstimator(
-				r1, r2, r1c1, r2c1, r1c2, r2c2, op1, op2, projRels);
-		tempQuery.runQuery();
-	}
-
 	public static void queryFromFile(String filename) throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, LowMemException,
 			UnknowAttrType, UnknownKeyTypeException, Exception {
-		if (parseQuery(filename)) {
-			_query.runQuery();
-		}
+		parseQuery(filename);
 	}
 
 	public static void query2c() throws JoinsException, IndexException,
@@ -107,13 +97,6 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		queryFromFile("queries/p3/query_2c_1.txt");
 	}
 
-	public static void query2c_2() throws JoinsException, IndexException,
-			InvalidTupleSizeException, InvalidTypeException,
-			PageNotReadException, PredEvalException, LowMemException,
-			UnknowAttrType, UnknownKeyTypeException, Exception {
-		queryFromFile("queries/p3/query_2c_2.txt");
-	}
-
 	public static void query2c_estimate() throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, LowMemException,
@@ -123,7 +106,8 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 
 	public static boolean runTests() {
 		try {
-			query2c_1();
+			query2c_estimate();
+		//	query2c_1();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -132,7 +116,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		return true;
 	}
 
-	private static boolean parseQuery(String filename) {
+	private static boolean parseQuery(String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
 		File file = new File(filename);
 
 		if (!file.exists()) {
@@ -235,7 +219,9 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 
 				_query = new IEJoinInMemoryQuerySelectivityEstimator(
 						tableNames[i], tableNames[i + 1], r1c1, r2c1, r1c2,
-						r2c2, op1, op2, projRels);
+						r2c2, op1, op2, projRels,0,0);
+				
+				_query.runQuery();
 			}
 
 			scan.close();
@@ -274,8 +260,8 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 public class SelectivityEstimatorTest {
 	public static void main(String argv[]) {
 
-		DBBuilder.build();
-
+		//DBBuilderP4.build();
+		
 		Map<String, Set<Integer>> projRels = new LinkedHashMap<String, Set<Integer>>();
 		projRels.put("R", new LinkedHashSet<Integer>());
 		projRels.get("R").add(1);
