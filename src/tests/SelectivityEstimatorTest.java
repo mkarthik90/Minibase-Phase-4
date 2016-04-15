@@ -72,6 +72,7 @@ class IEJoinInMemoryQuerySelectivityEstimator {
 
 class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 	private static IEJoinInMemoryQuerySelectivityEstimator _query;
+	private static int[] _sizeOfTables;
 
 	private IEJoinInMemorySelectivityEstimate() {
 	}
@@ -83,20 +84,6 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		parseQuery(filename);
 	}
 
-	public static void query2c() throws JoinsException, IndexException,
-			InvalidTupleSizeException, InvalidTypeException,
-			PageNotReadException, PredEvalException, LowMemException,
-			UnknowAttrType, UnknownKeyTypeException, Exception {
-		queryFromFile("queries/query_2c.txt");
-	}
-
-	public static void query2c_1() throws JoinsException, IndexException,
-			InvalidTupleSizeException, InvalidTypeException,
-			PageNotReadException, PredEvalException, LowMemException,
-			UnknowAttrType, UnknownKeyTypeException, Exception {
-		queryFromFile("queries/p3/query_2c_1.txt");
-	}
-
 	public static void query2c_estimate() throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, LowMemException,
@@ -104,10 +91,10 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		queryFromFile("queries/p3/query_2c_2.txt");
 	}
 
-	public static boolean runTests() {
+	public static boolean runTests(int[] sizeOfTables) {
 		try {
+			_sizeOfTables = sizeOfTables;
 			query2c_estimate();
-		//	query2c_1();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -216,6 +203,8 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 					scan.close();
 					return false;
 				}
+				
+				
 
 				_query = new IEJoinInMemoryQuerySelectivityEstimator(
 						tableNames[i], tableNames[i + 1], r1c1, r2c1, r1c2,
@@ -260,7 +249,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 public class SelectivityEstimatorTest {
 	public static void main(String argv[]) {
 
-		DBBuilderP4.build();
+		int[] sizeOfTables = DBBuilderP4.build();
 		
 		Map<String, Set<Integer>> projRels = new LinkedHashMap<String, Set<Integer>>();
 		projRels.put("R", new LinkedHashSet<Integer>());
@@ -269,7 +258,7 @@ public class SelectivityEstimatorTest {
 		projRels.put("S", new LinkedHashSet<Integer>());
 		projRels.get("S").add(1);
 
-		boolean sortstatus = IEJoinInMemorySelectivityEstimate.runTests();
+		boolean sortstatus = IEJoinInMemorySelectivityEstimate.runTests(sizeOfTables);
 
 	}
 }
