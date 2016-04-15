@@ -646,6 +646,11 @@ public class Histogram {
 		return null;
 	}
 	
+	public int get_size()
+	{
+		return numrow;
+	}
+	
 	private class Comp implements Comparator<Long>
 	{
 		public int compare(Long l, Long r)
