@@ -3,8 +3,6 @@ package tests;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import heap.Tuple;
-
 public class Histogram {
 	private int numrow;
 	private int numcol;

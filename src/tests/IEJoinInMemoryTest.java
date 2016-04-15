@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import bufmgr.BufMgr;
 import bufmgr.PageNotReadException;
 import global.AttrOperator;
 import global.AttrType;
