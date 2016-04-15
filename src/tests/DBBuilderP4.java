@@ -150,11 +150,11 @@ public class DBBuilderP4 implements GlobalConst{
 	private static ArrayList<TableEntry3> RTable3;
 	private static ArrayList<TableEntry4> RTable4;
 	private static ArrayList<TableEntry5> RTable5;
-	private static final String fn1 = "F1r";
-	private static final String fn2 = "F2r";
-	private static final String fn3 = "F3r";
-	private static final String fn4 = "F4r";
-	private static final String fn5 = "F5r";
+	private static final String fn1 = "F1NR";
+	private static final String fn2 = "F2NR";
+	private static final String fn3 = "F3NR";
+	private static final String fn4 = "F4NR";
+	private static final String fn5 = "F5NR";
 	
 	
 	public static int[] build()
