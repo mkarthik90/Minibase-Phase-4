@@ -152,7 +152,7 @@ public class DBBuilderP4 implements GlobalConst{
 	private static ArrayList<TableEntry5> RTable5;
 	
 	
-	public static void build()
+	public static int[] build()
 	{
 		RTable1 = new ArrayList<TableEntry1>();
 		RTable2 = new ArrayList<TableEntry2>();
@@ -594,11 +594,18 @@ public class DBBuilderP4 implements GlobalConst{
 				e.printStackTrace();
 			}      
 		}
+		
+		int sizes[] = new int[5];
+		sizes[0] = RTable1.size();
+		sizes[1] = RTable2.size();
+		sizes[2] = RTable3.size();
+		sizes[3] = RTable4.size();
+		sizes[4] = RTable5.size();
+		return sizes;
 	}
 	
 	public static Histogram[] build_sample()
 	{
-
 		RTable1 = new ArrayList<TableEntry1>();
 		RTable2 = new ArrayList<TableEntry2>();
 		RTable3 = new ArrayList<TableEntry3>();
@@ -1512,5 +1519,58 @@ public class DBBuilderP4 implements GlobalConst{
 		hist[4].build_sorted_hist(RTable5, 5);
 		
 		return hist;
+	}
+	
+	
+	public static void make_new_heap(String fn)
+	{
+		String dbpath = "/tmp/"+System.getProperty("user.name")+".minibase.jointestdb"; 
+		String logpath = "/tmp/"+System.getProperty("user.name")+".joinlog";
+
+		String remove_cmd = "/bin/rm -rf ";
+		String remove_logcmd = remove_cmd + logpath;
+		String remove_dbcmd = remove_cmd + dbpath;
+		String remove_joincmd = remove_cmd + dbpath;
+
+		try {
+			Runtime.getRuntime().exec(remove_logcmd);
+			Runtime.getRuntime().exec(remove_dbcmd);
+			Runtime.getRuntime().exec(remove_joincmd);
+		}
+		catch (IOException e) {
+			System.err.println (""+e);
+		}
+
+		short [] Ssizes = null;
+
+		Tuple t = new Tuple();
+
+		try {
+			t.setHdr((short) 4, TableEntry1.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		int size = t.size();
+
+		Heapfile        f = null;
+		try {
+			f = new Heapfile(fn + ".in");
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Heapfile constructor ***");
+			e.printStackTrace();
+		}
+
+		t = new Tuple(size);
+		try {
+			t.setHdr((short) 4, TableEntry1.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
 	}
 }
