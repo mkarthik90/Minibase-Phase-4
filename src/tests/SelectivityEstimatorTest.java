@@ -9,6 +9,7 @@ import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
 import index.IndexException;
 import iterator.IEJoinEstimator;
+import iterator.IEJoinInMemory;
 import iterator.JoinsException;
 import iterator.LowMemException;
 import iterator.PredEvalException;
@@ -71,7 +72,7 @@ class IEJoinInMemoryQuerySelectivityEstimator {
 }
 
 class IEJoinInMemorySelectivityEstimate implements GlobalConst {
-	private static IEJoinInMemoryQuerySelectivityEstimator _query;
+	private static IEJoinInMemory _query;
 	private static int[] _sizeOfTables;
 
 	private IEJoinInMemorySelectivityEstimate() {
@@ -225,36 +226,36 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				//Getting the table size
 				int tableSizeOne = 0, tableSizeTwo =0;
 				
-				if(tableNames[i].equalsIgnoreCase("f1")){
+				if(tableNames[i].equalsIgnoreCase("f1nr")){
 					tableSizeOne = _sizeOfTables[0];
 				}
-				else if(tableNames[i].equalsIgnoreCase("f2")){
+				else if(tableNames[i].equalsIgnoreCase("f2nr")){
 					tableSizeOne = _sizeOfTables[1];
 				}
-				else if(tableNames[i].equalsIgnoreCase("f3")){
+				else if(tableNames[i].equalsIgnoreCase("f3nr")){
 					tableSizeOne = _sizeOfTables[2];
 				}
-				else if(tableNames[i].equalsIgnoreCase("f4")){
+				else if(tableNames[i].equalsIgnoreCase("f4nr")){
 					tableSizeOne = _sizeOfTables[3];
 				}
-				else if(tableNames[i].equalsIgnoreCase("f5")){
+				else if(tableNames[i].equalsIgnoreCase("f5nr")){
 					tableSizeOne = _sizeOfTables[4];
 				}
 				
 				
-				if(tableNames[i+1].equalsIgnoreCase("f1")){
+				if(tableNames[i+1].equalsIgnoreCase("f1nr")){
 					tableSizeTwo = _sizeOfTables[0];
 				}
-				else if(tableNames[i+1].equalsIgnoreCase("f2")){
+				else if(tableNames[i+1].equalsIgnoreCase("f2nr")){
 					tableSizeTwo = _sizeOfTables[1];
 				}
-				else if(tableNames[i+1].equalsIgnoreCase("f3")){
+				else if(tableNames[i+1].equalsIgnoreCase("f3nr")){
 					tableSizeTwo = _sizeOfTables[2];
 				}
-				else if(tableNames[i+1].equalsIgnoreCase("f4")){
+				else if(tableNames[i+1].equalsIgnoreCase("f4nr")){
 					tableSizeTwo = _sizeOfTables[3];
 				}
-				else if(tableNames[i+1].equalsIgnoreCase("f5")){
+				else if(tableNames[i+1].equalsIgnoreCase("f5nr")){
 					tableSizeTwo = _sizeOfTables[4];
 				}
 				
@@ -263,11 +264,14 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				System.out.println(tableNames[i+1]);
 				
 
-				_query = new IEJoinInMemoryQuerySelectivityEstimator(
+				_query = new IEJoinInMemory(
 						tableNames[i], tableNames[i + 1], r1c1, r2c1, r1c2,
-						r2c2, op1, op2, projRels,tableSizeOne,tableSizeTwo);
+						r2c2, op1, op2, projRels);
 				
-				result[resultCounter] = _query.runQuery();
+				
+				_query.getResult();
+//				/ _query.runQuery();
+				System.out.println(result[resultCounter]);
 				resultCounter++;
 			}
 
