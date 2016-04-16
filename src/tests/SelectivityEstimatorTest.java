@@ -60,54 +60,48 @@ class IEJoinInMemoryQuerySelectivityEstimator {
 		}
 	}
 
-	public void runQuery() throws JoinsException, IndexException,
+	public int runQuery() throws JoinsException, IndexException,
 			InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, LowMemException,
 			UnknowAttrType, UnknownKeyTypeException, Exception {
 		IEJoinEstimator join = new IEJoinEstimator(_r1, _r2, _r1c1, _r2c1, _r1c2,
-				_r2c2, _op1, _op2, _projRels,0,0);
-		join.getResult();
+				_r2c2, _op1, _op2, _projRels,_table1Size,_table2Size);
+		return join.getResult();
 	}
 }
 
 class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 	private static IEJoinInMemoryQuerySelectivityEstimator _query;
+	private static int[] _sizeOfTables;
 
 	private IEJoinInMemorySelectivityEstimate() {
 	}
 
-	public static void queryFromFile(String filename) throws JoinsException,
+	public static int[] queryFromFile(String filename) throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, LowMemException,
 			UnknowAttrType, UnknownKeyTypeException, Exception {
-		parseQuery(filename);
+		return parseAndRunQuery(filename);
 	}
 
-	public static void query2c() throws JoinsException, IndexException,
-			InvalidTupleSizeException, InvalidTypeException,
-			PageNotReadException, PredEvalException, LowMemException,
-			UnknowAttrType, UnknownKeyTypeException, Exception {
-		queryFromFile("queries/query_2c.txt");
-	}
-
-	public static void query2c_1() throws JoinsException, IndexException,
-			InvalidTupleSizeException, InvalidTypeException,
-			PageNotReadException, PredEvalException, LowMemException,
-			UnknowAttrType, UnknownKeyTypeException, Exception {
-		queryFromFile("queries/p3/query_2c_1.txt");
-	}
-
-	public static void query2c_estimate() throws JoinsException,
+	public static int[] query2c_estimate() throws JoinsException,
 			IndexException, InvalidTupleSizeException, InvalidTypeException,
 			PageNotReadException, PredEvalException, LowMemException,
 			UnknowAttrType, UnknownKeyTypeException, Exception {
-		queryFromFile("queries/p3/query_2c_2.txt");
+		return queryFromFile("queries/phase4_query.txt");
 	}
 
-	public static boolean runTests() {
+	public static boolean runTests(int[] sizeOfTables) {
 		try {
-			query2c_estimate();
-		//	query2c_1();
+			_sizeOfTables = sizeOfTables;
+			int[] result = query2c_estimate();
+			
+			//TODO
+			for(int i=0;i<result.length;i++){
+				System.out.println(result[i]);
+			}
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -116,12 +110,12 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		return true;
 	}
 
-	private static boolean parseQuery(String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
+	private static int[] parseAndRunQuery(String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception {
 		File file = new File(filename);
 
 		if (!file.exists()) {
 			System.out.println("File at '" + filename + "' not found.");
-			return false;
+			return new int[0];
 		}
 
 		String line, r1, r2;
@@ -130,7 +124,22 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		String[] parts, relParts,tableNames;
 		Scanner scan;
 		Map<String, Set<Integer>> projRels = new LinkedHashMap<String, Set<Integer>>();
+		int resultCounter = 0;
 
+		
+		//Finding total number of conditions
+		Scanner scanner2 = new Scanner(file);
+		scanner2.nextLine();
+		scanner2.nextLine();
+		int totalNumberOfconditions = 0;
+		while(scanner2.hasNext()){
+			if(!scanner2.nextLine().equalsIgnoreCase("and")){
+				totalNumberOfconditions++;
+			}
+		}
+		
+		int result[] = new int[totalNumberOfconditions/2];
+		
 		try {
 			scan = new Scanner(file);
 
@@ -164,14 +173,14 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			// This loop will run for each two table join. If there are 4 tables
 			// to join with 8 predicates, this loop will run for 4 times to
 			// calculate 4 different estimate
-			for (int i = 0; i < tableNames.length; i = i + 2) {
+			for (int i = 0; i < tableNames.length - 1; i = i + 1) {
 
 				// Where Clause
 
 				// while (scan.hasNextLine()) {
 				twoPred = false;
 				int totalNumberOfCondition = 2;
-				while (totalNumberOfCondition > 0) {
+				while (totalNumberOfCondition >= 0) {
 					line = scan.nextLine().trim();
 
 					if (line.equals("AND")) {
@@ -212,16 +221,54 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				op1 = getAttrOp(op1);
 				op2 = getAttrOp(op2);
 
-				if (op1 == -1 || op2 == -1) {
-					scan.close();
-					return false;
+				
+				//Getting the table size
+				int tableSizeOne = 0, tableSizeTwo =0;
+				
+				if(tableNames[i].equalsIgnoreCase("f1")){
+					tableSizeOne = _sizeOfTables[0];
 				}
+				else if(tableNames[i].equalsIgnoreCase("f2")){
+					tableSizeOne = _sizeOfTables[1];
+				}
+				else if(tableNames[i].equalsIgnoreCase("f3")){
+					tableSizeOne = _sizeOfTables[2];
+				}
+				else if(tableNames[i].equalsIgnoreCase("f4")){
+					tableSizeOne = _sizeOfTables[3];
+				}
+				else if(tableNames[i].equalsIgnoreCase("f5")){
+					tableSizeOne = _sizeOfTables[4];
+				}
+				
+				
+				if(tableNames[i+1].equalsIgnoreCase("f1")){
+					tableSizeTwo = _sizeOfTables[0];
+				}
+				else if(tableNames[i+1].equalsIgnoreCase("f2")){
+					tableSizeTwo = _sizeOfTables[1];
+				}
+				else if(tableNames[i+1].equalsIgnoreCase("f3")){
+					tableSizeTwo = _sizeOfTables[2];
+				}
+				else if(tableNames[i+1].equalsIgnoreCase("f4")){
+					tableSizeTwo = _sizeOfTables[3];
+				}
+				else if(tableNames[i+1].equalsIgnoreCase("f5")){
+					tableSizeTwo = _sizeOfTables[4];
+				}
+				
+				System.out.println("*****");
+				System.out.println(tableNames[i]);
+				System.out.println(tableNames[i+1]);
+				
 
 				_query = new IEJoinInMemoryQuerySelectivityEstimator(
 						tableNames[i], tableNames[i + 1], r1c1, r2c1, r1c2,
-						r2c2, op1, op2, projRels,0,0);
+						r2c2, op1, op2, projRels,tableSizeOne,tableSizeTwo);
 				
-				_query.runQuery();
+				result[resultCounter] = _query.runQuery();
+				resultCounter++;
 			}
 
 			scan.close();
@@ -229,7 +276,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			e.printStackTrace();
 		}
 
-		return true;
+		return result;
 	}
 
 	private static int getAttrOp(int op) {
@@ -260,16 +307,9 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 public class SelectivityEstimatorTest {
 	public static void main(String argv[]) {
 
-		DBBuilderP4.build();
+		int[] sizeOfTables = DBBuilderP4.build();
 		
-		Map<String, Set<Integer>> projRels = new LinkedHashMap<String, Set<Integer>>();
-		projRels.put("R", new LinkedHashSet<Integer>());
-		projRels.get("R").add(1);
-
-		projRels.put("S", new LinkedHashSet<Integer>());
-		projRels.get("S").add(1);
-
-		boolean sortstatus = IEJoinInMemorySelectivityEstimate.runTests();
+		boolean sortstatus = IEJoinInMemorySelectivityEstimate.runTests(sizeOfTables);
 
 	}
 }
