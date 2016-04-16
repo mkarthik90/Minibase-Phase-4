@@ -36,11 +36,11 @@ public class IEJoinInMemory extends Iterator{
 	    	tableColNums.put("R", 4);
 	    	tableColNums.put("S", 4);
 	    	tableColNums.put("Q", 4);
-	    	tableColNums.put("F1NR-10", 4);
-	    	tableColNums.put("F2NR-10", 7);
-	    	tableColNums.put("F3NR-10", 7);
-	    	tableColNums.put("F4NR-10", 7);
-	    	tableColNums.put("F5NR-10", 3);
+	    	tableColNums.put("F1NR", 4);
+	    	tableColNums.put("F2NR", 7);
+	    	tableColNums.put("F3NR", 7);
+	    	tableColNums.put("F4NR", 7);
+	    	tableColNums.put("F5NR", 3);
 	    	
 	    	for(String key : tableColNums.keySet()){
 	    		attrTypes.put(key, new AttrType[tableColNums.get(key)]);
@@ -463,7 +463,7 @@ public class IEJoinInMemory extends Iterator{
 
 					Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
 					
-					outTuple.print(projAttrs);
+					//outTuple.print(projAttrs);
 
 					if(saveResults){
 						DBBuilderP4.insert_tuple(hFile, outTuple);
