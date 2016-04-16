@@ -72,7 +72,7 @@ class IEJoinInMemoryQuerySelectivityEstimator {
 }
 
 class IEJoinInMemorySelectivityEstimate implements GlobalConst {
-	private static IEJoinInMemory _query;
+	private static IEJoinEstimator _query;
 	private static int[] _sizeOfTables;
 
 	private IEJoinInMemorySelectivityEstimate() {
@@ -99,6 +99,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			
 			//TODO
 			for(int i=0;i<result.length;i++){
+				System.out.println("Output for condition"+(i+1));
 				System.out.println(result[i]);
 			}
 			
@@ -120,7 +121,6 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		}
 
 		String line, r1, r2;
-		boolean twoPred = false;
 		int r1c1 = -1, r1c2 = -1, r2c1 = -1, r2c2 = -1, op1 = -1, op2 = -1;
 		String[] parts, relParts,tableNames;
 		Scanner scan;
@@ -174,30 +174,29 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			// This loop will run for each two table join. If there are 4 tables
 			// to join with 8 predicates, this loop will run for 4 times to
 			// calculate 4 different estimate
+			boolean firstConditionSet = false;
 			for (int i = 0; i < tableNames.length - 1; i = i + 1) {
 
 				// Where Clause
+				
+				if(i != 0){
+					//Did this to scan extra AND statement
+					scan.nextLine();
+				}
 
 				// while (scan.hasNextLine()) {
-				twoPred = false;
 				int totalNumberOfCondition = 2;
 				while (totalNumberOfCondition >= 0) {
 					line = scan.nextLine().trim();
+					
+					
 
 					if (line.equals("AND")) {
-						twoPred = true;
+						
 					} else {
 						parts = line.split(" ");
 
-						if (twoPred) {
-							relParts = parts[0].split("_");
-							r1c2 = Integer.parseInt(relParts[1]);
-
-							op2 = Integer.parseInt(parts[1]);
-
-							relParts = parts[2].split("_");
-							r2c2 = Integer.parseInt(relParts[1]);
-						} else {
+						if (firstConditionSet == false) {
 							relParts = parts[0].split("_");
 							r1 = relParts[0];
 							r1c1 = Integer.parseInt(relParts[1]);
@@ -207,17 +206,23 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 							relParts = parts[2].split("_");
 							r2 = relParts[0];
 							r2c1 = Integer.parseInt(relParts[1]);
+							firstConditionSet = true;
+						
+						} else {
+
+							relParts = parts[0].split("_");
+							r1c2 = Integer.parseInt(relParts[1]);
+
+							op2 = Integer.parseInt(parts[1]);
+
+							relParts = parts[2].split("_");
+							r2c2 = Integer.parseInt(relParts[1]);
+							firstConditionSet = false;
 						}
 					}
 					totalNumberOfCondition--;
 				}
 				// }
-
-				if (!twoPred) {
-					op2 = op1;
-					r1c2 = r1c1;
-					r2c2 = r2c1;
-				}
 
 				op1 = getAttrOp(op1);
 				op2 = getAttrOp(op2);
@@ -264,14 +269,14 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				System.out.println(tableNames[i+1]);
 				
 
-				_query = new IEJoinInMemory(
+				_query = new IEJoinEstimator(
 						tableNames[i], tableNames[i + 1], r1c1, r2c1, r1c2,
-						r2c2, op1, op2, projRels);
+						r2c2, op1, op2, projRels,tableSizeOne,tableSizeTwo);
 				
 				
-				_query.getResult();
-//				/ _query.runQuery();
+				result[resultCounter] = _query.getResult();
 				System.out.println(result[resultCounter]);
+//				/ _query.runQuery();
 				resultCounter++;
 			}
 
