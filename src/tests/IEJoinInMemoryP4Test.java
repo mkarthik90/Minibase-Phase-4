@@ -7,7 +7,8 @@ import parser.QueryParser;
 public class IEJoinInMemoryP4Test {
 	public static void main(String[] args){
 		try {
-			DBBuilderP4.build_sorted();
+			DBBuilderP4.build();
+			//DBBuilder.build();
 			Query query = QueryParser.parse("queries/p4/query_3a.txt");
 			System.out.println(query);
 			IEJoinInMemoryP4 test = new IEJoinInMemoryP4(query, false);

@@ -15,22 +15,47 @@ import global.AttrOperator;
 import global.AttrType;
 import global.TupleOrder;
 import heap.FieldNumberOutOfBoundException;
+import heap.Heapfile;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
 import heap.Tuple;
 import index.IndexException;
 import parser.QueryPred;
-import parser.QueryRel;
+import tests.DBBuilderP4;
 
 public class IEJoinInMemory extends Iterator{
 
-	public static AttrType[] _ATTR_TYPES = {new AttrType (AttrType.attrInteger), new AttrType (AttrType.attrInteger),
-			new AttrType (AttrType.attrInteger), new AttrType (AttrType.attrInteger)};
-	private final FldSpec[] _BASIC_PROJECTION = {new FldSpec(new RelSpec(RelSpec.outer), 1),
-			new FldSpec(new RelSpec(RelSpec.outer), 2), new FldSpec(new RelSpec(RelSpec.outer), 3),
-			new FldSpec(new RelSpec(RelSpec.outer), 4)};
+	public static Map<String, AttrType[]> attrTypes;
+	public static Map<String, FldSpec[]> basicProjections;
+	public static Map<String, Integer> tableColNums;
+	    static
+	    {
+	    	basicProjections = new HashMap<String, FldSpec[]>();
+	    	attrTypes = new HashMap<String, AttrType[]>();
+	    	tableColNums = new HashMap<String, Integer>();
+	    	tableColNums.put("R", 4);
+	    	tableColNums.put("S", 4);
+	    	tableColNums.put("Q", 4);
+	    	tableColNums.put("F1NR-10", 4);
+	    	tableColNums.put("F2NR-10", 7);
+	    	tableColNums.put("F3NR-10", 7);
+	    	tableColNums.put("F4NR-10", 7);
+	    	tableColNums.put("F5NR-10", 3);
+	    	
+	    	for(String key : tableColNums.keySet()){
+	    		attrTypes.put(key, new AttrType[tableColNums.get(key)]);
+	    		basicProjections.put(key, new FldSpec[tableColNums.get(key)]);
+	    		
+	    		for(int i = 0; i < attrTypes.get(key).length; i++){
+	    			basicProjections.get(key)[i] = new FldSpec(new RelSpec(RelSpec.outer), i+1);
+	    			attrTypes.get(key)[i] = new AttrType(AttrType.attrInteger);
+	    		}
+	    	}
+	    }
+	    
 	private int[] l1Offset, l2Offset, bitArray, permArr, primePermArr;
 	private int eqOff, m, n;
+	private String _r1, _r2;
 	private Map<String, Set<Integer>> _projRels;
 	private IEJoinInMemoryArray _elements;
 
@@ -77,20 +102,6 @@ public class IEJoinInMemory extends Iterator{
 			_values = new HashMap<IEJoinInMemoryArrayType, List<Tuple>>();
 			_populateValues(r1, r2);
 			_sortValues(r1c1, r2c1, r1c2, r2c2, op1, op2);
-		}
-
-		private void _print(){
-			for(IEJoinInMemoryArrayType key : _values.keySet()){
-				System.out.println(key);
-				for(Tuple tuple : _values.get(key)){
-					try {
-						tuple.print(_ATTR_TYPES);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
 		}
 
 		public int getR1Size(){
@@ -153,13 +164,13 @@ public class IEJoinInMemory extends Iterator{
 			}
 
 			try {
-				FileScan r1Scan = new FileScan(r1 + ".in", _ATTR_TYPES, null, (short)4, (short)4, _BASIC_PROJECTION, null),
-						r2Scan = new FileScan(r2 + ".in", _ATTR_TYPES, null, (short)4, (short)4, _BASIC_PROJECTION, null);
+				FileScan r1Scan = new FileScan(r1 + ".in", attrTypes.get(r1), null, (short) tableColNums.get(r1).intValue(), (short) tableColNums.get(r1).intValue(), basicProjections.get(r1), null),
+						r2Scan = new FileScan(r2 + ".in", attrTypes.get(r2), null, (short) tableColNums.get(r2).intValue(), (short) tableColNums.get(r2).intValue(), basicProjections.get(r2), null);
 				Tuple temp, tempCopy;
 
 				while((temp = r1Scan.get_next()) != null){
 					tempCopy = new Tuple();
-					tempCopy.setHdr((short)4, _ATTR_TYPES, null);
+					tempCopy.setHdr((short) tableColNums.get(r1).intValue(), attrTypes.get(r1), null);
 					tempCopy.tupleCopy(temp);
 
 					_values.get(IEJoinInMemoryArrayType.L1).add(tempCopy);
@@ -168,7 +179,7 @@ public class IEJoinInMemory extends Iterator{
 
 				while((temp = r2Scan.get_next()) != null){
 					tempCopy = new Tuple();
-					tempCopy.setHdr((short)4, _ATTR_TYPES, null);
+					tempCopy.setHdr((short) tableColNums.get(r2).intValue(), attrTypes.get(r2), null);
 					tempCopy.tupleCopy(temp);
 
 					_values.get(IEJoinInMemoryArrayType.L1Prime).add(tempCopy);
@@ -217,7 +228,7 @@ public class IEJoinInMemory extends Iterator{
 	public static IEJoinInMemory fromPred(QueryPred pred1, QueryPred pred2, Map<String, Set<Integer>> projRels) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
 		String r1, r2;
 		int r1c1, r1c2, r2c1, r2c2, op1, op2;
-
+		
 		op1 = pred1.op.attrOperator;
 		op2 = pred2.op.attrOperator;
 
@@ -245,6 +256,8 @@ public class IEJoinInMemory extends Iterator{
 	public IEJoinInMemory(String r1, String r2, int r1c1, int r2c1, int r1c2, int r2c2, int op1, int op2, Map<String, Set<Integer>> projRels) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
 		_projRels = projRels;
 		_elements = new IEJoinInMemoryArray(r1, r2, r1c1, r2c1, r1c2, r2c2, op1, op2);
+		_r1 = r1;
+		_r2 = r2;
 		m = _elements.getR1Size();
 		n = _elements.getR2Size();
 
@@ -368,13 +381,24 @@ public class IEJoinInMemory extends Iterator{
 			eqOff = 0;
 		}
 	}
-
-
-
+	
 	public void getResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
+		this._getResult(false, "");
+	}
+	
+	public void writeResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
+		this._getResult(true, "int");
+	}
+
+	private void _getResult(boolean saveResults, String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
+		Heapfile hFile = null;
+		
+		if(saveResults){
+			hFile = DBBuilderP4.make_new_heap(filename);
+		}
+
 		Tuple l1 = null, l1Prime = null, outTuple;
 		int off2, off1, k;
-		//List<Tuple> result = new ArrayList<Tuple>();
 
 		List<FldSpec> projMat = new ArrayList<FldSpec>();
 		FldSpec[] permMat;
@@ -400,7 +424,7 @@ public class IEJoinInMemory extends Iterator{
 		projAttrs = new AttrType[projMat.size()];
 
 		for(int i = 0; i < projAttrs.length; i++){
-			projAttrs[i] = new AttrType (AttrType.attrInteger);
+			projAttrs[i] = new AttrType(AttrType.attrInteger);
 		}	
 
 		permMat = new FldSpec[projMat.size()];
@@ -412,11 +436,6 @@ public class IEJoinInMemory extends Iterator{
 			off2 = l2Offset[i];
 
 			for(int j = 0; j < off2; j++){
-				/*if(j >= primePermArr.length){
-					break;
-				}
-				 */
-
 				int idx = primePermArr[j];
 
 				if(idx < bitArray.length){
@@ -432,31 +451,25 @@ public class IEJoinInMemory extends Iterator{
 				l1Prime = _elements.getFromL1Prime(k);
 
 				if(bitArray[k] == 1){
-					/*
-					System.out.println("ADDING L2 & L2 PRIME");
-					System.out.println("L2: ");
-					l1.print(_ATTR_TYPES);
-					System.out.println("L2 PRIME:");
-					l1Prime.print(_ATTR_TYPES);
-					 */
-
 					Tuple out1 = new Tuple(), out2 = new Tuple();
-					out1.setHdr((short)4, _ATTR_TYPES, null);
-					out2.setHdr((short)4, _ATTR_TYPES, null);
+					out1.setHdr((short) tableColNums.get(_r1).intValue(), attrTypes.get(_r1), null);
+					out2.setHdr((short) tableColNums.get(_r2).intValue(), attrTypes.get(_r2), null);
 
 					out1.tupleCopy(l1);
 					out2.tupleCopy(l1Prime);
 
 					outTuple = new Tuple();
-
 					outTuple.setHdr((short)projAttrs.length, projAttrs, null);
 
-					Projection.Join(out1, _ATTR_TYPES, out2, _ATTR_TYPES, outTuple, permMat, permMat.length);
-
+					Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
+					
 					outTuple.print(projAttrs);
-					numTuples++;
 
-					//result.add(outTuple);
+					if(saveResults){
+						DBBuilderP4.insert_tuple(hFile, outTuple);
+					}
+
+					numTuples++;
 				}
 
 				k++;

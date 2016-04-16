@@ -7,21 +7,29 @@ import java.util.Map;
 import java.util.Set;
 
 import bufmgr.PageNotReadException;
+import heap.Heapfile;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
 import index.IndexException;
 import parser.Query;
 import parser.QueryPred;
 import parser.QueryRel;
+import tests.DBBuilderP4;
 
 public class IEJoinInMemoryP4 {
 	private Map<String, Set<Integer>> _allProjRels;
+	public Map<String, Map<Integer, Integer>> intermediateCols;
+	private int _currIntCol;
 
 	public IEJoinInMemoryP4(Query query, boolean onDisk) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
+		_currIntCol = 1;
+		intermediateCols = new HashMap<String, Map<Integer, Integer>>();
 		_populateProjRels(query);
 
 		QueryPred pred, pred1, pred2;
+		QueryRel intRel;
 		Iterator<QueryPred> it = query.where.iterator();
+		int col;
 
 		pred1 = it.next();
 
@@ -33,10 +41,14 @@ public class IEJoinInMemoryP4 {
 		}
 
 		IEJoinInMemory join = IEJoinInMemory.fromPred(pred1, pred2, _allProjRels);
-		join.getResult();
+		join.writeResult();
 
 		while(it.hasNext()){
 			pred = it.next();
+
+			col = 1;
+			intRel = new QueryRel("int", col);
+			pred.leftRel = intRel;
 		}
 	}
 
@@ -59,5 +71,17 @@ public class IEJoinInMemoryP4 {
 		}
 
 		_allProjRels.get(rel.table).add(rel.col);
+		_setIntCols(rel);
+	}
+	
+	private void _setIntCols(QueryRel rel){
+		if(!intermediateCols.containsKey(rel.table)){
+			intermediateCols.put(rel.table, new HashMap<Integer, Integer>());
+			
+			for(int i = 0; i < IEJoinInMemory.tableColNums.get(rel.table); i++){
+                intermediateCols.get(rel.table).put(i+1, _currIntCol);
+                _currIntCol++;
+			}
+		}
 	}
 }
