@@ -133,11 +133,12 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		scanner2.nextLine();
 		int totalNumberOfconditions = 0;
 		while(scanner2.hasNext()){
-			totalNumberOfconditions++;
-			scanner2.nextLine();
+			if(!scanner2.nextLine().equalsIgnoreCase("and")){
+				totalNumberOfconditions++;
+			}
 		}
 		
-		int result[] = new int[totalNumberOfconditions];
+		int result[] = new int[totalNumberOfconditions/2];
 		
 		try {
 			scan = new Scanner(file);
@@ -172,14 +173,14 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			// This loop will run for each two table join. If there are 4 tables
 			// to join with 8 predicates, this loop will run for 4 times to
 			// calculate 4 different estimate
-			for (int i = 0; i < tableNames.length; i = i + 2) {
+			for (int i = 0; i < tableNames.length - 1; i = i + 1) {
 
 				// Where Clause
 
 				// while (scan.hasNextLine()) {
 				twoPred = false;
 				int totalNumberOfCondition = 2;
-				while (totalNumberOfCondition > 0) {
+				while (totalNumberOfCondition >= 0) {
 					line = scan.nextLine().trim();
 
 					if (line.equals("AND")) {
@@ -256,6 +257,10 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				else if(tableNames[i+1].equalsIgnoreCase("f5")){
 					tableSizeTwo = _sizeOfTables[4];
 				}
+				
+				System.out.println("*****");
+				System.out.println(tableNames[i]);
+				System.out.println(tableNames[i+1]);
 				
 
 				_query = new IEJoinInMemoryQuerySelectivityEstimator(

@@ -1,3 +1,11 @@
-/tests/
+/btree/
+/bufmgr/
+/catalog/
+/chainexception/
+/diskmgr/
+/global/
+/heap/
+/index/
 /iterator/
 /parser/
+/tests/
