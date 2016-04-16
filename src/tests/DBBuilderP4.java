@@ -150,6 +150,11 @@ public class DBBuilderP4 implements GlobalConst{
 	private static ArrayList<TableEntry3> RTable3;
 	private static ArrayList<TableEntry4> RTable4;
 	private static ArrayList<TableEntry5> RTable5;
+	private static final String fn1 = "F1NR";
+	private static final String fn2 = "F2NR";
+	private static final String fn3 = "F3NR";
+	private static final String fn4 = "F4NR";
+	private static final String fn5 = "F5NR";
 	
 	
 	public static int[] build()
@@ -161,11 +166,6 @@ public class DBBuilderP4 implements GlobalConst{
 		RTable5 = new ArrayList<TableEntry5>();
 		Histogram hist[] = new Histogram[5];
 		String fndb = "datasetsPhase4/";
-		String fn1 = "F1";
-		String fn2 = "F2";
-		String fn3 = "F3";
-		String fn4 = "F4";
-		String fn5 = "F5";
 		String line;
 		String parts[];
 		int r1 = 0;
@@ -189,10 +189,10 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
 				te1 = new TableEntry1(r1,r2,r3,r4);
 				RTable1.add(te1);
 			}
@@ -285,13 +285,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te2 = new TableEntry2(r1,r2,r3,r4,r5,r6,r7);
 				RTable2.add(te2);
 			}
@@ -366,13 +366,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te3 = new TableEntry3(r1,r2,r3,r4,r5,r6,r7);
 				RTable3.add(te3);
 			}
@@ -448,13 +448,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te4 = new TableEntry4(r1,r2,r3,r4,r5,r6,r7);
 				RTable4.add(te4);
 			}
@@ -529,9 +529,9 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
 				te5 = new TableEntry5(r1,r2,r3);
 				RTable5.add(te5);
 			}
@@ -613,11 +613,6 @@ public class DBBuilderP4 implements GlobalConst{
 		RTable5 = new ArrayList<TableEntry5>();
 		Histogram hist[] = new Histogram[5];
 		String fndb = "datasetsPhase4/";
-		String fn1 = "F1";
-		String fn2 = "F2";
-		String fn3 = "F3";
-		String fn4 = "F4";
-		String fn5 = "F5";
 		String line;
 		String parts[];
 		int r1 = 0;
@@ -641,10 +636,10 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
 				te1 = new TableEntry1(r1,r2,r3,r4);
 				RTable1.add(te1);
 			}
@@ -737,13 +732,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te2 = new TableEntry2(r1,r2,r3,r4,r5,r6,r7);
 				RTable2.add(te2);
 			}
@@ -818,13 +813,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te3 = new TableEntry3(r1,r2,r3,r4,r5,r6,r7);
 				RTable3.add(te3);
 			}
@@ -900,13 +895,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te4 = new TableEntry4(r1,r2,r3,r4,r5,r6,r7);
 				RTable4.add(te4);
 			}
@@ -981,9 +976,9 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
 				te5 = new TableEntry5(r1,r2,r3);
 				RTable5.add(te5);
 			}
@@ -1071,11 +1066,6 @@ public class DBBuilderP4 implements GlobalConst{
 		RTable5 = new ArrayList<TableEntry5>();
 		Histogram hist[] = new Histogram[5];
 		String fndb = "datasetsPhase4/";
-		String fn1 = "F1";
-		String fn2 = "F2";
-		String fn3 = "F3";
-		String fn4 = "F4";
-		String fn5 = "F5";
 		String line;
 		String parts[];
 		int r1 = 0;
@@ -1099,10 +1089,10 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
 				te1 = new TableEntry1(r1,r2,r3,r4);
 				RTable1.add(te1);
 			}
@@ -1195,13 +1185,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te2 = new TableEntry2(r1,r2,r3,r4,r5,r6,r7);
 				RTable2.add(te2);
 			}
@@ -1276,13 +1266,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te3 = new TableEntry3(r1,r2,r3,r4,r5,r6,r7);
 				RTable3.add(te3);
 			}
@@ -1358,13 +1348,13 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
-				r4 = (int)(Double.valueOf(parts[3]).longValue());
-				r5 = (int)(Double.valueOf(parts[4]).longValue());
-				r6 = (int)(Double.valueOf(parts[5]).longValue());
-				r7 = (int)(Double.valueOf(parts[6]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
 				te4 = new TableEntry4(r1,r2,r3,r4,r5,r6,r7);
 				RTable4.add(te4);
 			}
@@ -1439,9 +1429,9 @@ public class DBBuilderP4 implements GlobalConst{
 			while((line = bufferedReader.readLine()) != null) 
 			{
 				parts = line.split(",");
-				r1 = (int)(Double.valueOf(parts[0]).longValue());
-				r2 = (int)(Double.valueOf(parts[1]).longValue());
-				r3 = (int)(Double.valueOf(parts[2]).longValue());
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
 				te5 = new TableEntry5(r1,r2,r3);
 				RTable5.add(te5);
 			}
@@ -1522,7 +1512,7 @@ public class DBBuilderP4 implements GlobalConst{
 	}
 	
 	
-	public static void make_new_heap(String fn)
+	public static Heapfile make_new_heap(String fn)
 	{
 		String dbpath = "/tmp/"+System.getProperty("user.name")+".minibase.jointestdb"; 
 		String logpath = "/tmp/"+System.getProperty("user.name")+".joinlog";
@@ -1541,19 +1531,13 @@ public class DBBuilderP4 implements GlobalConst{
 			System.err.println (""+e);
 		}
 
-		short [] Ssizes = null;
-
 		Tuple t = new Tuple();
 
-		try {
-			t.setHdr((short) 4, TableEntry1.at, Ssizes);
+		try{
+			Runtime.getRuntime().exec("rm " + fn + ".in");
 		}
-		catch (Exception e) {
-			System.err.println("*** error in Tuple.setHdr() ***");
-			e.printStackTrace();
-		}
-
-		int size = t.size();
+		catch(Exception e)
+		{}
 
 		Heapfile        f = null;
 		try {
@@ -1563,14 +1547,14 @@ public class DBBuilderP4 implements GlobalConst{
 			System.err.println("*** error in Heapfile constructor ***");
 			e.printStackTrace();
 		}
-
-		t = new Tuple(size);
-		try {
-			t.setHdr((short) 4, TableEntry1.at, Ssizes);
-		}
-		catch (Exception e) {
-			System.err.println("*** error in Tuple.setHdr() ***");
-			e.printStackTrace();
-		}
+		
+		return f;
+	}
+	
+	public static void insert_tuple(Heapfile f, Tuple t)
+	{
+		try
+		{f.insertRecord(t.returnTupleByteArray());}
+		catch(Exception e){}
 	}
 }
