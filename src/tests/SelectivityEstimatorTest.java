@@ -82,6 +82,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 	private static IEJoinEstimator _query;
 	private static int[] _sizeOfTables;
 	private static List<List<QueryPred>> queryPredicateList = new LinkedList<List<QueryPred>>();
+	private static int percentageToSample = 5;
 
 	private IEJoinInMemorySelectivityEstimate() {
 	}
@@ -305,10 +306,13 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				System.out.println(tableNames[i+1]);
 				
 				
+				//Finding the number of tuples for estimation
+				int numberOfSamplesForTable1 = tableSizeOne / percentageToSample;
+				int numberOfSamplesForTable2 = tableSizeTwo/percentageToSample;
 				
 				_query = new IEJoinEstimator(
 						tableNames[i], tableNames[i + 1], r1c1, r2c1, r1c2,
-						r2c2, op1, op2, projRels,tableSizeOne,tableSizeTwo);
+						r2c2, op1, op2, projRels,numberOfSamplesForTable1,numberOfSamplesForTable2);
 				
 				QueryRel leftRel1 = new QueryRel(tableNames[i], r1c1);
 				QueryRel rightRel1 = new QueryRel(tableNames[i+1], r2c1);
