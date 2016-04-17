@@ -7,14 +7,13 @@ import java.util.Map;
 import java.util.Set;
 
 import bufmgr.PageNotReadException;
-import heap.Heapfile;
+import global.AttrType;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
 import index.IndexException;
 import parser.Query;
 import parser.QueryPred;
 import parser.QueryRel;
-import tests.DBBuilderP4;
 
 public class IEJoinInMemoryP4 {
 	private Map<String, Set<Integer>> _allProjRels;
@@ -25,6 +24,7 @@ public class IEJoinInMemoryP4 {
 		_currIntCol = 1;
 		intermediateCols = new HashMap<String, Map<Integer, Integer>>();
 		_populateProjRels(query);
+		_setIntCols();
 
 		QueryPred pred, pred1, pred2;
 		QueryRel intRel;
@@ -44,11 +44,25 @@ public class IEJoinInMemoryP4 {
 		join.writeResult();
 
 		while(it.hasNext()){
-			pred = it.next();
+			pred1 = it.next();
 
-			col = 1;
-			intRel = new QueryRel("int", col);
-			pred.leftRel = intRel;
+			if(it.hasNext()){
+				pred2 = it.next();
+			}
+			else{
+				throw new IllegalArgumentException("Not enough predicates in query.");
+			}
+
+			col = getIntCol(pred1.leftRel);
+			intRel = new QueryRel("intermediate", col);
+			pred1.leftRel = intRel;
+
+			col = getIntCol(pred2.leftRel);
+			intRel = new QueryRel("intermediate", col);
+			pred2.leftRel = intRel;
+
+			join = IEJoinInMemory.fromPred(pred1, pred2, _allProjRels);
+			join.writeResult();
 		}
 	}
 
@@ -71,17 +85,31 @@ public class IEJoinInMemoryP4 {
 		}
 
 		_allProjRels.get(rel.table).add(rel.col);
-		_setIntCols(rel);
 	}
-	
-	private void _setIntCols(QueryRel rel){
-		if(!intermediateCols.containsKey(rel.table)){
-			intermediateCols.put(rel.table, new HashMap<Integer, Integer>());
-			
-			for(int i = 0; i < IEJoinInMemory.tableColNums.get(rel.table); i++){
-                intermediateCols.get(rel.table).put(i+1, _currIntCol);
-                _currIntCol++;
+
+	private void _setIntCols(){
+		for(String key : _allProjRels.keySet()){
+			if(!intermediateCols.containsKey(key)){
+				intermediateCols.put(key, new HashMap<Integer, Integer>());
+			}
+
+			for(Integer temp : _allProjRels.get(key)){
+				intermediateCols.get(key).put(temp, _currIntCol);
+				_currIntCol++;
 			}
 		}
+
+		IEJoinInMemory.basicProjections.put("intermediate", new FldSpec[_currIntCol - 1]);
+		IEJoinInMemory.attrTypes.put("intermediate", new AttrType[_currIntCol - 1]);
+		IEJoinInMemory.tableColNums.put("intermediate", _currIntCol - 1);
+
+		for(int i = 0; i < IEJoinInMemory.basicProjections.get("intermediate").length; i++){
+			IEJoinInMemory.attrTypes.get("intermediate")[i] = new AttrType(AttrType.attrInteger);
+			IEJoinInMemory.basicProjections.get("intermediate")[i] = new FldSpec(new RelSpec(RelSpec.outer), i+1);
+		}
+	}
+
+	public int getIntCol(QueryRel rel){
+		return intermediateCols.get(rel.table).get(rel.col);
 	}
 }

@@ -54,10 +54,11 @@ public class IEJoinInMemory extends Iterator{
 	    }
 	    
 	private int[] l1Offset, l2Offset, bitArray, permArr, primePermArr;
-	private int eqOff, m, n;
+	private int eqOff, m, n, _op1, _op2, _r1c1, _r1c2, _r2c1, _r2c2;
 	private String _r1, _r2;
 	private Map<String, Set<Integer>> _projRels;
 	private IEJoinInMemoryArray _elements;
+	private static Heapfile _hFile = null;
 
 	enum IEJoinInMemoryArrayType{
 		L1, L1Prime, L2, L2Prime;
@@ -258,6 +259,12 @@ public class IEJoinInMemory extends Iterator{
 		_elements = new IEJoinInMemoryArray(r1, r2, r1c1, r2c1, r1c2, r2c2, op1, op2);
 		_r1 = r1;
 		_r2 = r2;
+		_r1c1 = r1c1;
+		_r1c2 = r1c2;
+		_r2c1 = r2c1;
+		_r2c2 = r2c2;
+		_op1 = op1;
+		_op2 = op2;
 		m = _elements.getR1Size();
 		n = _elements.getR2Size();
 
@@ -375,7 +382,7 @@ public class IEJoinInMemory extends Iterator{
 
 		//line 13-14
 		if((op1 == AttrOperator.aopLE || op1 == AttrOperator.aopGE) || (op2 == AttrOperator.aopLE || op2 == AttrOperator.aopGE)){
-			eqOff = 0;
+			eqOff = 1;
 		}
 		else{
 			eqOff = 0;
@@ -387,14 +394,16 @@ public class IEJoinInMemory extends Iterator{
 	}
 	
 	public void writeResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
-		this._getResult(true, "int");
+		this._getResult(true, "intermediate");
 	}
 
 	private void _getResult(boolean saveResults, String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
-		Heapfile hFile = null;
-		
 		if(saveResults){
-			hFile = DBBuilderP4.make_new_heap(filename);
+			if(_hFile != null){
+				_hFile.deleteFile();
+			}
+
+			_hFile = DBBuilderP4.make_new_heap(filename);
 		}
 
 		Tuple l1 = null, l1Prime = null, outTuple;
@@ -457,16 +466,28 @@ public class IEJoinInMemory extends Iterator{
 
 					out1.tupleCopy(l1);
 					out2.tupleCopy(l1Prime);
+					
+					int p1Out1 = out1.getIntFld(_r1c1), p1Out2 = out1.getIntFld(_r1c2),
+							p2Out1 = out2.getIntFld(_r2c1), p2Out2 = out2.getIntFld(_r2c2);
+					
+					if(!_evaluate(p1Out1, _op1, p2Out1) || !_evaluate(p1Out2, _op2, p2Out2)){
+						k++;
+						continue;
+					}
 
 					outTuple = new Tuple();
 					outTuple.setHdr((short)projAttrs.length, projAttrs, null);
 
 					Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
 					
-					outTuple.print(projAttrs);
+						outTuple.print(projAttrs);
 
-					if(saveResults){
-						DBBuilderP4.insert_tuple(hFile, outTuple);
+					if(!saveResults){
+						outTuple.print(projAttrs);
+					}
+					else{
+						DBBuilderP4.insert_tuple(_hFile, outTuple);
+						//hFile.insertRecord(outTuple.returnTupleByteArray());
 					}
 
 					numTuples++;
@@ -478,6 +499,32 @@ public class IEJoinInMemory extends Iterator{
 
 		System.out.println("Number of tuples: " + numTuples);
 		//return result;
+	}
+	
+	private boolean _evaluate(int op1, int op, int op2) throws IllegalArgumentException{
+		boolean valid;
+		
+		switch(op){
+		case AttrOperator.aopLT:
+			valid = op1 < op2;
+			break;
+		case AttrOperator.aopGT:
+			valid = op1 > op2;
+			break;
+		case AttrOperator.aopGE:
+			valid = op1 >= op2;
+			break;
+		case AttrOperator.aopLE:
+			valid = op1 <= op2;
+			break;
+		case AttrOperator.aopEQ:
+			valid = op1 == op2;
+			break;
+		default:
+			throw new IllegalArgumentException("WHAAAAT");
+		}
+		
+		return valid;
 	}
 
 	@Override

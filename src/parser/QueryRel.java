@@ -1,6 +1,6 @@
 package parser;
 
-public class QueryRel {
+public class QueryRel implements Cloneable{
 	public String table;
 	public int col;
 	
@@ -19,5 +19,10 @@ public class QueryRel {
 	@Override
 	public String toString(){
 		return table + "." + col;
+	}
+	
+	@Override
+	public QueryRel clone(){
+		return new QueryRel(this.table, this.col);
 	}
 }

@@ -2,7 +2,7 @@ package parser;
 
 import global.AttrOperator;
 
-public class QueryPred {
+public class QueryPred implements Cloneable {
 	public QueryRel leftRel, rightRel;
 	public AttrOperator op;
 	
@@ -44,5 +44,10 @@ public class QueryPred {
 		}
 
 		return str;
+	}
+	
+	@Override
+	public QueryPred clone(){
+		return new QueryPred(this.leftRel.clone(), new AttrOperator(this.op.attrOperator), this.rightRel.clone());
 	}
 }
