@@ -37,6 +37,8 @@ public class Query {
 		from.add(str);
 	}
 
+	//rel1 => R_1 < Q_1
+	//rel2 -> R_2 > Q_2
 	public void addWhere(String rel1, AttrOperator op, String rel2){
 		String t1, t2;
 		int c1, c2;
@@ -49,6 +51,10 @@ public class Query {
 		addWhere(new QueryRel(t1, c1), op, new QueryRel(t2, c2));
 	}
 
+	public void addWhere(QueryPred pred){
+		where.add(pred);
+	}
+	
 	public void addWhere(QueryRel r1, AttrOperator op, QueryRel r2){
 		where.add(new QueryPred(r1, op, r2));
 	}
