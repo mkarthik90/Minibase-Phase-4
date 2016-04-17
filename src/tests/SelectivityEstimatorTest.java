@@ -10,6 +10,7 @@ import heap.InvalidTypeException;
 import index.IndexException;
 import iterator.IEJoinEstimator;
 import iterator.IEJoinInMemory;
+import iterator.IEJoinInMemoryP4;
 import iterator.JoinsException;
 import iterator.LowMemException;
 import iterator.PredEvalException;
@@ -20,10 +21,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import parser.Query;
+import parser.QueryPred;
+import parser.QueryRel;
 import bufmgr.PageNotReadException;
 
 class IEJoinInMemoryQuerySelectivityEstimator {
@@ -32,6 +38,7 @@ class IEJoinInMemoryQuerySelectivityEstimator {
 	private static int _r1c1, _r1c2, _r2c1, _r2c2, _op1, _op2;
 	private static AttrType[] _attrTypes;
 	private static int _table1Size = 0, _table2Size = 0;
+	
 
 	public IEJoinInMemoryQuerySelectivityEstimator(String r1, String r2,
 			int r1c1, int r2c1, int r1c2, int r2c2, int op1, int op2,
@@ -72,8 +79,9 @@ class IEJoinInMemoryQuerySelectivityEstimator {
 }
 
 class IEJoinInMemorySelectivityEstimate implements GlobalConst {
-	private static IEJoinInMemory _query;
+	private static IEJoinEstimator _query;
 	private static int[] _sizeOfTables;
+	private static List<List<QueryPred>> queryPredicateList = new LinkedList<List<QueryPred>>();
 
 	private IEJoinInMemorySelectivityEstimate() {
 	}
@@ -96,11 +104,39 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		try {
 			_sizeOfTables = sizeOfTables;
 			int[] result = query2c_estimate();
-			
+			int minimumValue =0, minimumValuePosition = 0;
 			//TODO
 			for(int i=0;i<result.length;i++){
-				System.out.println(result[i]);
+				
+				if(i == 0){
+					minimumValue = result[i];
+					minimumValuePosition = i;
+				}
+				
+				if(minimumValue > result[i]){
+					minimumValue = result[i];
+					minimumValuePosition = i;
+				}
 			}
+			
+			System.out.println("Minimym valuye is in position"+minimumValuePosition);
+			System.out.println("Minimum value is "+minimumValue);
+			
+			Query q = new Query();
+
+			for (int i = minimumValuePosition; i < result.length; i++) {
+				List<QueryPred> queryPredicates = queryPredicateList.get(i);
+				q.addWhere(queryPredicates.get(0));
+				q.addWhere(queryPredicates.get(1));
+			}
+
+			for (int i = minimumValue - 1; i >= 0; i--) {
+				List<QueryPred> queryPredicates = queryPredicateList.get(i);
+				q.addWhere(queryPredicates.get(0));
+				q.addWhere(queryPredicates.get(1));
+			}
+			
+			IEJoinInMemoryP4 ieJoinP4 = new IEJoinInMemoryP4(q, true);
 			
 			
 		} catch (Exception e) {
@@ -120,7 +156,6 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		}
 
 		String line, r1, r2;
-		boolean twoPred = false;
 		int r1c1 = -1, r1c2 = -1, r2c1 = -1, r2c2 = -1, op1 = -1, op2 = -1;
 		String[] parts, relParts,tableNames;
 		Scanner scan;
@@ -174,30 +209,30 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			// This loop will run for each two table join. If there are 4 tables
 			// to join with 8 predicates, this loop will run for 4 times to
 			// calculate 4 different estimate
+			boolean firstConditionSet = false;
+			
 			for (int i = 0; i < tableNames.length - 1; i = i + 1) {
 
 				// Where Clause
+				
+				if(i != 0){
+					//Did this to scan extra AND statement
+					scan.nextLine();
+				}
 
 				// while (scan.hasNextLine()) {
-				twoPred = false;
 				int totalNumberOfCondition = 2;
 				while (totalNumberOfCondition >= 0) {
 					line = scan.nextLine().trim();
+					
+					
 
 					if (line.equals("AND")) {
-						twoPred = true;
+						
 					} else {
 						parts = line.split(" ");
 
-						if (twoPred) {
-							relParts = parts[0].split("_");
-							r1c2 = Integer.parseInt(relParts[1]);
-
-							op2 = Integer.parseInt(parts[1]);
-
-							relParts = parts[2].split("_");
-							r2c2 = Integer.parseInt(relParts[1]);
-						} else {
+						if (firstConditionSet == false) {
 							relParts = parts[0].split("_");
 							r1 = relParts[0];
 							r1c1 = Integer.parseInt(relParts[1]);
@@ -207,17 +242,23 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 							relParts = parts[2].split("_");
 							r2 = relParts[0];
 							r2c1 = Integer.parseInt(relParts[1]);
+							firstConditionSet = true;
+						
+						} else {
+
+							relParts = parts[0].split("_");
+							r1c2 = Integer.parseInt(relParts[1]);
+
+							op2 = Integer.parseInt(parts[1]);
+
+							relParts = parts[2].split("_");
+							r2c2 = Integer.parseInt(relParts[1]);
+							firstConditionSet = false;
 						}
 					}
 					totalNumberOfCondition--;
 				}
 				// }
-
-				if (!twoPred) {
-					op2 = op1;
-					r1c2 = r1c1;
-					r2c2 = r2c1;
-				}
 
 				op1 = getAttrOp(op1);
 				op2 = getAttrOp(op2);
@@ -263,15 +304,32 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				System.out.println(tableNames[i]);
 				System.out.println(tableNames[i+1]);
 				
-
-				_query = new IEJoinInMemory(
+				
+				
+				_query = new IEJoinEstimator(
 						tableNames[i], tableNames[i + 1], r1c1, r2c1, r1c2,
-						r2c2, op1, op2, projRels);
+						r2c2, op1, op2, projRels,tableSizeOne,tableSizeTwo);
+				
+				QueryRel leftRel1 = new QueryRel(tableNames[i], r1c1);
+				QueryRel rightRel1 = new QueryRel(tableNames[i+1], r2c1);
+				QueryPred qp  = new QueryPred(leftRel1, new AttrOperator(op1), rightRel1);
 				
 				
-				_query.getResult();
-//				/ _query.runQuery();
+				QueryRel leftRel2 = new QueryRel(tableNames[i], r1c2);
+				QueryRel rightRel2 = new QueryRel(tableNames[i+1], r2c2);
+				QueryPred qp2  = new QueryPred(leftRel2, new AttrOperator(op2), rightRel2);
+				
+				
+				List<QueryPred> queryPredicate = new LinkedList<QueryPred>();
+				
+				queryPredicate.add(qp);
+				queryPredicate.add(qp2);
+				
+				queryPredicateList.add(queryPredicate);
+				
+				result[resultCounter] = _query.getResult();
 				System.out.println(result[resultCounter]);
+//				/ _query.runQuery();
 				resultCounter++;
 			}
 
