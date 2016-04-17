@@ -1,8 +1,8 @@
 package iterator;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,16 +17,16 @@ import parser.QueryRel;
 
 public class IEJoinInMemoryP4 {
 	private Map<String, Set<Integer>> _allProjRels;
-	public Map<String, Map<Integer, Integer>> intermediateCols;
+	public static Map<String, Map<Integer, Integer>> intermediateCols;
 	private int _currIntCol;
 
 	public IEJoinInMemoryP4(Query query, boolean onDisk) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
 		_currIntCol = 1;
-		intermediateCols = new HashMap<String, Map<Integer, Integer>>();
+		intermediateCols = new LinkedHashMap<String, Map<Integer, Integer>>();
 		_populateProjRels(query);
 		_setIntCols();
 
-		QueryPred pred, pred1, pred2;
+		QueryPred pred1, pred2;
 		QueryRel intRel;
 		Iterator<QueryPred> it = query.where.iterator();
 		int col;
@@ -67,7 +67,7 @@ public class IEJoinInMemoryP4 {
 	}
 
 	private void _populateProjRels(Query query) {
-		_allProjRels = new HashMap<String, Set<Integer>>();
+		_allProjRels = new LinkedHashMap<String, Set<Integer>>();
 
 		for(QueryRel rel : query.select){
 			_addRelCol(rel);
@@ -81,7 +81,7 @@ public class IEJoinInMemoryP4 {
 
 	private void _addRelCol(QueryRel rel){
 		if(!_allProjRels.containsKey(rel.table)){
-			_allProjRels.put(rel.table, new HashSet<Integer>());
+			_allProjRels.put(rel.table, new LinkedHashSet<Integer>());
 		}
 
 		_allProjRels.get(rel.table).add(rel.col);
@@ -90,7 +90,7 @@ public class IEJoinInMemoryP4 {
 	private void _setIntCols(){
 		for(String key : _allProjRels.keySet()){
 			if(!intermediateCols.containsKey(key)){
-				intermediateCols.put(key, new HashMap<Integer, Integer>());
+				intermediateCols.put(key, new LinkedHashMap<Integer, Integer>());
 			}
 
 			for(Integer temp : _allProjRels.get(key)){
@@ -109,7 +109,11 @@ public class IEJoinInMemoryP4 {
 		}
 	}
 
-	public int getIntCol(QueryRel rel){
+	public static int getIntCol(QueryRel rel){
 		return intermediateCols.get(rel.table).get(rel.col);
+	}
+	
+	public static int getIntCol(String table, int col){
+		return intermediateCols.get(table).get(col);
 	}
 }

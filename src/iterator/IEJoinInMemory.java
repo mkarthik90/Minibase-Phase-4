@@ -28,31 +28,31 @@ public class IEJoinInMemory extends Iterator{
 	public static Map<String, AttrType[]> attrTypes;
 	public static Map<String, FldSpec[]> basicProjections;
 	public static Map<String, Integer> tableColNums;
-	    static
-	    {
-	    	basicProjections = new HashMap<String, FldSpec[]>();
-	    	attrTypes = new HashMap<String, AttrType[]>();
-	    	tableColNums = new HashMap<String, Integer>();
-	    	tableColNums.put("R", 4);
-	    	tableColNums.put("S", 4);
-	    	tableColNums.put("Q", 4);
-	    	tableColNums.put("F1NR", 4);
-	    	tableColNums.put("F2NR", 7);
-	    	tableColNums.put("F3NR", 7);
-	    	tableColNums.put("F4NR", 7);
-	    	tableColNums.put("F5NR", 3);
-	    	
-	    	for(String key : tableColNums.keySet()){
-	    		attrTypes.put(key, new AttrType[tableColNums.get(key)]);
-	    		basicProjections.put(key, new FldSpec[tableColNums.get(key)]);
-	    		
-	    		for(int i = 0; i < attrTypes.get(key).length; i++){
-	    			basicProjections.get(key)[i] = new FldSpec(new RelSpec(RelSpec.outer), i+1);
-	    			attrTypes.get(key)[i] = new AttrType(AttrType.attrInteger);
-	    		}
-	    	}
-	    }
-	    
+	static
+	{
+		basicProjections = new HashMap<String, FldSpec[]>();
+		attrTypes = new HashMap<String, AttrType[]>();
+		tableColNums = new HashMap<String, Integer>();
+		tableColNums.put("R", 4);
+		tableColNums.put("S", 4);
+		tableColNums.put("Q", 4);
+		tableColNums.put("F1NR-10", 4);
+		tableColNums.put("F2NR-10", 7);
+		tableColNums.put("F3NR-10", 7);
+		tableColNums.put("F4NR-10", 7);
+		tableColNums.put("F5NR-10", 3);
+
+		for(String key : tableColNums.keySet()){
+			attrTypes.put(key, new AttrType[tableColNums.get(key)]);
+			basicProjections.put(key, new FldSpec[tableColNums.get(key)]);
+
+			for(int i = 0; i < attrTypes.get(key).length; i++){
+				basicProjections.get(key)[i] = new FldSpec(new RelSpec(RelSpec.outer), i+1);
+				attrTypes.get(key)[i] = new AttrType(AttrType.attrInteger);
+			}
+		}
+	}
+
 	private int[] l1Offset, l2Offset, bitArray, permArr, primePermArr;
 	private int eqOff, m, n, _op1, _op2, _r1c1, _r1c2, _r2c1, _r2c2;
 	private String _r1, _r2;
@@ -208,7 +208,7 @@ public class IEJoinInMemory extends Iterator{
 		public Tuple getFromL2Prime(int idx){
 			return _get(IEJoinInMemoryArrayType.L2Prime, idx);
 		}
-		
+
 		public int getL2PrimeSize(){
 			return _getSize(IEJoinInMemoryArrayType.L2Prime);
 		}
@@ -216,7 +216,7 @@ public class IEJoinInMemory extends Iterator{
 		public int getL2Size(){
 			return _getSize(IEJoinInMemoryArrayType.L2);
 		}
-		
+
 		private int _getSize(IEJoinInMemoryArrayType type){
 			return _values.get(type).size();
 		}
@@ -229,7 +229,7 @@ public class IEJoinInMemory extends Iterator{
 	public static IEJoinInMemory fromPred(QueryPred pred1, QueryPred pred2, Map<String, Set<Integer>> projRels) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
 		String r1, r2;
 		int r1c1, r1c2, r2c1, r2c2, op1, op2;
-		
+
 		op1 = pred1.op.attrOperator;
 		op2 = pred2.op.attrOperator;
 
@@ -238,7 +238,7 @@ public class IEJoinInMemory extends Iterator{
 
 		r1c1 = pred1.leftRel.col;
 		r2c1 = pred1.rightRel.col;
-		
+
 		/*
 		 * Check to see if order of tables is reversed in second predicate!
 		 */
@@ -250,7 +250,7 @@ public class IEJoinInMemory extends Iterator{
 			r1c2 = pred2.rightRel.col;
 			r2c2 = pred2.leftRel.col;
 		}
-		
+
 		return new IEJoinInMemory(r1, r2, r1c1, r2c1, r1c2, r2c2, op1, op2, projRels);
 	}
 
@@ -388,11 +388,11 @@ public class IEJoinInMemory extends Iterator{
 			eqOff = 0;
 		}
 	}
-	
+
 	public void getResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
 		this._getResult(false, "");
 	}
-	
+
 	public void writeResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
 		this._getResult(true, "intermediate");
 	}
@@ -411,23 +411,24 @@ public class IEJoinInMemory extends Iterator{
 
 		List<FldSpec> projMat = new ArrayList<FldSpec>();
 		FldSpec[] permMat;
-		boolean outer = true;
 		RelSpec spec;
 		AttrType[] projAttrs; 
 
 		for(String key : _projRels.keySet()){
 			for(Integer col : _projRels.get(key)){
-				if(outer){
-					spec = new RelSpec(RelSpec.outer);
+				if(key.equals(_r2)){
+					spec = new RelSpec(RelSpec.innerRel);
 				}
 				else{
-					spec = new RelSpec(RelSpec.innerRel);
+					if(_r1.equals("intermediate")){
+						col = IEJoinInMemoryP4.getIntCol(key, col);
+					}
+
+					spec = new RelSpec(RelSpec.outer);
 				}
 
 				projMat.add(new FldSpec(spec, col));
 			}
-
-			outer = false;
 		}
 
 		projAttrs = new AttrType[projMat.size()];
@@ -466,10 +467,10 @@ public class IEJoinInMemory extends Iterator{
 
 					out1.tupleCopy(l1);
 					out2.tupleCopy(l1Prime);
-					
+
 					int p1Out1 = out1.getIntFld(_r1c1), p1Out2 = out1.getIntFld(_r1c2),
 							p2Out1 = out2.getIntFld(_r2c1), p2Out2 = out2.getIntFld(_r2c2);
-					
+
 					if(!_evaluate(p1Out1, _op1, p2Out1) || !_evaluate(p1Out2, _op2, p2Out2)){
 						k++;
 						continue;
@@ -479,8 +480,8 @@ public class IEJoinInMemory extends Iterator{
 					outTuple.setHdr((short)projAttrs.length, projAttrs, null);
 
 					Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
-					
-						outTuple.print(projAttrs);
+
+				//	outTuple.print(projAttrs);
 
 					if(!saveResults){
 						outTuple.print(projAttrs);
@@ -500,10 +501,10 @@ public class IEJoinInMemory extends Iterator{
 		System.out.println("Number of tuples: " + numTuples);
 		//return result;
 	}
-	
+
 	private boolean _evaluate(int op1, int op, int op2) throws IllegalArgumentException{
 		boolean valid;
-		
+
 		switch(op){
 		case AttrOperator.aopLT:
 			valid = op1 < op2;
@@ -523,7 +524,7 @@ public class IEJoinInMemory extends Iterator{
 		default:
 			throw new IllegalArgumentException("WHAAAAT");
 		}
-		
+
 		return valid;
 	}
 
