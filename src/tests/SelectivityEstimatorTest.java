@@ -82,6 +82,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 	private static IEJoinEstimator _query;
 	private static int[] _sizeOfTables;
 	private static List<List<QueryPred>> queryPredicateList = new LinkedList<List<QueryPred>>();
+	private static int percentageToSample = 1;
 
 	private IEJoinInMemorySelectivityEstimate() {
 	}
@@ -104,41 +105,41 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 		try {
 			_sizeOfTables = sizeOfTables;
 			int[] result = query2c_estimate();
-			int minimumValue =0, minimumValuePosition = 0;
-			//TODO
-			for(int i=0;i<result.length;i++){
-				
-				if(i == 0){
+			int minimumValue = 0, minimumValuePosition = 0;
+			// TODO
+			for (int i = 0; i < result.length; i++) {
+
+				if (i == 0) {
 					minimumValue = result[i];
 					minimumValuePosition = i;
 				}
-				
-				if(minimumValue > result[i]){
+
+				if (minimumValue > result[i]) {
 					minimumValue = result[i];
 					minimumValuePosition = i;
 				}
 			}
-			
-			System.out.println("Minimym valuye is in position"+minimumValuePosition);
-			System.out.println("Minimum value is "+minimumValue);
-			
-			Query q = new Query();
 
+			System.out.println("Minimym valuye is in position"
+					+ minimumValuePosition);
+			System.out.println("Minimum value is " + minimumValue);
+
+			Query q = new Query();
 			for (int i = minimumValuePosition; i < result.length; i++) {
 				List<QueryPred> queryPredicates = queryPredicateList.get(i);
 				q.addWhere(queryPredicates.get(0));
 				q.addWhere(queryPredicates.get(1));
 			}
 
-			for (int i = minimumValue - 1; i >= 0; i--) {
+			for (int i = minimumValuePosition - 1; i >= 0; i--) {
 				List<QueryPred> queryPredicates = queryPredicateList.get(i);
 				q.addWhere(queryPredicates.get(0));
 				q.addWhere(queryPredicates.get(1));
 			}
 			
+			System.out.println(q.toString());
 			IEJoinInMemoryP4 ieJoinP4 = new IEJoinInMemoryP4(q, true);
-			
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -305,10 +306,13 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				System.out.println(tableNames[i+1]);
 				
 				
+				//Finding the number of tuples for estimation
+				int numberOfSamplesForTable1 = tableSizeOne / percentageToSample;
+				int numberOfSamplesForTable2 = tableSizeTwo/percentageToSample;
 				
 				_query = new IEJoinEstimator(
 						tableNames[i], tableNames[i + 1], r1c1, r2c1, r1c2,
-						r2c2, op1, op2, projRels,tableSizeOne,tableSizeTwo);
+						r2c2, op1, op2, projRels,numberOfSamplesForTable1,numberOfSamplesForTable2);
 				
 				QueryRel leftRel1 = new QueryRel(tableNames[i], r1c1);
 				QueryRel rightRel1 = new QueryRel(tableNames[i+1], r2c1);

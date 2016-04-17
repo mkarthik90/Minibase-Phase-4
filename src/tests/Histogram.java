@@ -8,7 +8,7 @@ import heap.Tuple;
 public class Histogram {
 	private int numrow;
 	private int numcol;
-	private long intervals[][];
+	private int intervals[][];
 	public static final int RESOLUTION = 200;
 	public static final int PERCENTAGE = 10;
 	public static final int SAMPLE = 1;
@@ -27,7 +27,7 @@ public class Histogram {
 		{
 			num_intervals = (numrow * PERCENTAGE) / 100;
 		}
-		intervals = new long[numcol][num_intervals];
+		intervals = new int[numcol][num_intervals];
 		for(int i = 0; i < numcol; i++)
 		{
 			for(int j = 0; j < num_intervals; j++)
@@ -39,7 +39,7 @@ public class Histogram {
 	
 	public void build_sample_hist(ArrayList rela, int num)
 	{
-		ArrayList<Long> col = null;
+		ArrayList<Integer> col = null;
 		switch(num)
 		{
 		case 1:
@@ -254,390 +254,390 @@ public class Histogram {
 	
 	public void build_sorted_hist(ArrayList rela, int num)
 	{
-		ArrayList<Long> col = null;
+		ArrayList<Integer> col = null;
 		Comp com = new Comp();
 		switch(num)
 		{
 		case 1:
 			ArrayList<TableEntry1> rel1 = (ArrayList<TableEntry1>)rela;
 			//first-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel1.get(i).rel1));
+				col.add(new Integer(rel1.get(i).rel1));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[0][i] = col.get(i * RESOLUTION).longValue();
+				intervals[0][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[0][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[0][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//second--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel1.get(i).rel2));
+				col.add(new Integer(rel1.get(i).rel2));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[1][i] = col.get(i * RESOLUTION).longValue();
+				intervals[1][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[1][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[1][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//third--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel1.get(i).rel3));
+				col.add(new Integer(rel1.get(i).rel3));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[2][i] = col.get(i * RESOLUTION).longValue();
+				intervals[2][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[2][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[2][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//fourth-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel1.get(i).rel4));
+				col.add(new Integer(rel1.get(i).rel4));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[3][i] = col.get(i * RESOLUTION).longValue();
+				intervals[3][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[3][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[3][num_intervals - 1] = col.get(col.size() - 1).intValue();
 			break;
 		case 2:
 			ArrayList<TableEntry2> rel2 = (ArrayList<TableEntry2>)rela;
 			//first-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel2.get(i).rel1));
+				col.add(new Integer(rel2.get(i).rel1));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[0][i] = col.get(i * RESOLUTION).longValue();
+				intervals[0][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[0][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[0][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//second--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel2.get(i).rel2));
+				col.add(new Integer(rel2.get(i).rel2));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[1][i] = col.get(i * RESOLUTION).longValue();
+				intervals[1][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[1][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[1][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//third--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel2.get(i).rel3));
+				col.add(new Integer(rel2.get(i).rel3));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[2][i] = col.get(i * RESOLUTION).longValue();
+				intervals[2][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[2][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[2][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//fourth-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel2.get(i).rel4));
+				col.add(new Integer(rel2.get(i).rel4));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[3][i] = col.get(i * RESOLUTION).longValue();
+				intervals[3][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[3][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[3][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//fifth-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel2.get(i).rel5));
+				col.add(new Integer(rel2.get(i).rel5));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[4][i] = col.get(i * RESOLUTION).longValue();
+				intervals[4][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[4][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[4][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//sixth--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel2.get(i).rel6));
+				col.add(new Integer(rel2.get(i).rel6));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[5][i] = col.get(i * RESOLUTION).longValue();
+				intervals[5][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[5][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[5][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//seventh--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel2.get(i).rel7));
+				col.add(new Integer(rel2.get(i).rel7));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[6][i] = col.get(i * RESOLUTION).longValue();
+				intervals[6][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[6][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[6][num_intervals - 1] = col.get(col.size() - 1).intValue();
 			break;
 		case 3:
 			ArrayList<TableEntry3> rel3 = (ArrayList<TableEntry3>)rela;
 
 			//first-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel3.get(i).rel1));
+				col.add(new Integer(rel3.get(i).rel1));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[0][i] = col.get(i * RESOLUTION).longValue();
+				intervals[0][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[0][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[0][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//second--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel3.get(i).rel2));
+				col.add(new Integer(rel3.get(i).rel2));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[1][i] = col.get(i * RESOLUTION).longValue();
+				intervals[1][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[1][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[1][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//third--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel3.get(i).rel3));
+				col.add(new Integer(rel3.get(i).rel3));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[2][i] = col.get(i * RESOLUTION).longValue();
+				intervals[2][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[2][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[2][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//fourth-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel3.get(i).rel4));
+				col.add(new Integer(rel3.get(i).rel4));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[3][i] = col.get(i * RESOLUTION).longValue();
+				intervals[3][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[3][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[3][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//fifth-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel3.get(i).rel5));
+				col.add(new Integer(rel3.get(i).rel5));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[4][i] = col.get(i * RESOLUTION).longValue();
+				intervals[4][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[4][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[4][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//sixth--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel3.get(i).rel6));
+				col.add(new Integer(rel3.get(i).rel6));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[5][i] = col.get(i * RESOLUTION).longValue();
+				intervals[5][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[5][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[5][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//seventh--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel3.get(i).rel7));
+				col.add(new Integer(rel3.get(i).rel7));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[6][i] = col.get(i * RESOLUTION).longValue();
+				intervals[6][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[6][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[6][num_intervals - 1] = col.get(col.size() - 1).intValue();
 			break;
 		case 4:
 			ArrayList<TableEntry4> rel4 = (ArrayList<TableEntry4>) rela;
 			//first-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel4.get(i).rel1));
+				col.add(new Integer(rel4.get(i).rel1));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[0][i] = col.get(i * RESOLUTION).longValue();
+				intervals[0][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[0][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[0][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//second--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel4.get(i).rel2));
+				col.add(new Integer(rel4.get(i).rel2));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[1][i] = col.get(i * RESOLUTION).longValue();
+				intervals[1][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[1][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[1][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//third--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel4.get(i).rel3));
+				col.add(new Integer(rel4.get(i).rel3));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[2][i] = col.get(i * RESOLUTION).longValue();
+				intervals[2][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[2][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[2][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//fourth-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel4.get(i).rel4));
+				col.add(new Integer(rel4.get(i).rel4));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[3][i] = col.get(i * RESOLUTION).longValue();
+				intervals[3][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[3][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[3][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//fifth-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel4.get(i).rel5));
+				col.add(new Integer(rel4.get(i).rel5));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[4][i] = col.get(i * RESOLUTION).longValue();
+				intervals[4][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[4][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[4][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//sixth--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel4.get(i).rel6));
+				col.add(new Integer(rel4.get(i).rel6));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[5][i] = col.get(i * RESOLUTION).longValue();
+				intervals[5][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[5][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[5][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//seventh--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel4.get(i).rel7));
+				col.add(new Integer(rel4.get(i).rel7));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[6][i] = col.get(i * RESOLUTION).longValue();
+				intervals[6][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[6][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[6][num_intervals - 1] = col.get(col.size() - 1).intValue();
 			break;
 		case 5:
 			ArrayList<TableEntry5> rel5 = (ArrayList<TableEntry5>) rela;
 
 			//first-------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel5.get(i).rel1));
+				col.add(new Integer(rel5.get(i).rel1));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[0][i] = col.get(i * RESOLUTION).longValue();
+				intervals[0][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[0][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[0][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//second--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel5.get(i).rel2));
+				col.add(new Integer(rel5.get(i).rel2));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[1][i] = col.get(i * RESOLUTION).longValue();
+				intervals[1][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[1][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[1][num_intervals - 1] = col.get(col.size() - 1).intValue();
 	
 			//third--------------------------------------------------------------------
-			col = new ArrayList<Long>();
+			col = new ArrayList<Integer>();
 			for(int i = 0; i < numrow; i++)
 			{
-				col.add(new Long(rel5.get(i).rel3));
+				col.add(new Integer(rel5.get(i).rel3));
 			}
 			col.sort(com);
 			for(int i = 0; i < num_intervals - 1; i++)
 			{
-				intervals[2][i] = col.get(i * RESOLUTION).longValue();
+				intervals[2][i] = col.get(i * RESOLUTION).intValue();
 			}
-			intervals[2][num_intervals - 1] = col.get(col.size() - 1).longValue();
+			intervals[2][num_intervals - 1] = col.get(col.size() - 1).intValue();
 			break;
 		}
 	}
 	
-	public long[] view_hist(int col)
+	public int[] view_hist(int col)
 	{
 		if(col <= numcol && col > 0)
 		{
@@ -651,13 +651,13 @@ public class Histogram {
 		return numrow;
 	}
 	
-	private class Comp implements Comparator<Long>
+	private class Comp implements Comparator<Integer>
 	{
-		public int compare(Long l, Long r)
+		public int compare(Integer l, Integer r)
 		{
-			if(l.longValue() < r.longValue())
+			if(l.intValue() < r.intValue())
 				return 1;
-			else if(l.longValue() > r.longValue())
+			else if(l.intValue() > r.intValue())
 				return -1;
 			else
 				return 0;
