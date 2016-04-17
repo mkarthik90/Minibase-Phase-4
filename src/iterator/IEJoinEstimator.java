@@ -1,16 +1,5 @@
 package iterator;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import bufmgr.PageNotReadException;
 import global.AttrOperator;
 import global.AttrType;
 import global.TupleOrder;
@@ -20,17 +9,27 @@ import heap.InvalidTypeException;
 import heap.Tuple;
 import index.IndexException;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import bufmgr.PageNotReadException;
+
 public class IEJoinEstimator extends Iterator{
 
-	public static AttrType[] _ATTR_TYPES = {new AttrType (AttrType.attrInteger), new AttrType (AttrType.attrInteger),
-			new AttrType (AttrType.attrInteger), new AttrType (AttrType.attrInteger)};
-	private final FldSpec[] _BASIC_PROJECTION = {new FldSpec(new RelSpec(RelSpec.outer), 1),
-			new FldSpec(new RelSpec(RelSpec.outer), 2), new FldSpec(new RelSpec(RelSpec.outer), 3),
-			new FldSpec(new RelSpec(RelSpec.outer), 4)};
+	
 	private int[] l1Offset, l2Offset, bitArray, permArr, primePermArr;
 	private int eqOff, m, n;
 	private Map<String, Set<Integer>> _projRels;
 	private IEJoinEstimatorArray _elements;
+	private String _r1, _r2;
 
 	enum IEJoinEstimatorArrayType{
 		L1, L1Prime, L2, L2Prime;
@@ -69,26 +68,15 @@ public class IEJoinEstimator extends Iterator{
 
 	class IEJoinEstimatorArray{
 		private Map<IEJoinEstimatorArrayType, List<Tuple>> _values;
+		private Map<IEJoinEstimatorArrayType, List<Tuple>> _tempValues;
+		private int percentage = 10;
 		private int _l1TupleOrder, _l2TupleOrder;
 
 		public IEJoinEstimatorArray(String r1, String r2, int r1c1, int r2c1, int r1c2, int r2c2, int op1, int op2, int r1Size, int r2Size){
 			_values = new HashMap<IEJoinEstimatorArrayType, List<Tuple>>();
+			_tempValues = new HashMap<IEJoinEstimatorArrayType, List<Tuple>>();
 			_populateValues(r1, r2, r1Size, r2Size);
-			//_sortValues(r1c1, r2c1, r1c2, r2c2, op1, op2);
-		}
-
-		private void _print(){
-			for(IEJoinEstimatorArrayType key : _values.keySet()){
-				System.out.println(key);
-				for(Tuple tuple : _values.get(key)){
-					try {
-						tuple.print(_ATTR_TYPES);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
+			_sortValues(r1c1, r2c1, r1c2, r2c2, op1, op2);
 		}
 
 		public int getR1Size(){
@@ -148,30 +136,55 @@ public class IEJoinEstimator extends Iterator{
 		private void _populateValues(String r1, String r2, int r1Size, int r2Size){
 			for(IEJoinEstimatorArrayType type : IEJoinEstimatorArrayType.ALL_TYPES){
 				_values.put(type, new ArrayList<Tuple>());
+				_tempValues.put(type, new ArrayList<Tuple>());
 			}
 
 			try {
-				FileScan r1Scan = new FileScan(r1 + ".in", _ATTR_TYPES, null, (short)4, (short)4, _BASIC_PROJECTION, null),
-						r2Scan = new FileScan(r2 + ".in", _ATTR_TYPES, null, (short)4, (short)4, _BASIC_PROJECTION, null);
+				FileScan r1Scan = new FileScan(r1 + ".in", IEJoinInMemory.attrTypes.get(r1), null, (short) IEJoinInMemory.tableColNums.get(r1).intValue(), (short) IEJoinInMemory.tableColNums.get(r1).intValue(), IEJoinInMemory.basicProjections.get(r1), null),
+						r2Scan = new FileScan(r2 + ".in", IEJoinInMemory.attrTypes.get(r2), null, (short) IEJoinInMemory.tableColNums.get(r2).intValue(), (short) IEJoinInMemory.tableColNums.get(r2).intValue(), IEJoinInMemory.basicProjections.get(r2), null);
 				Tuple temp, tempCopy;
 
 				while((temp = r1Scan.get_next()) != null && _values.get(IEJoinEstimatorArrayType.L1).size() < r1Size){
 					tempCopy = new Tuple();
-					tempCopy.setHdr((short)4, _ATTR_TYPES, null);
+					tempCopy.setHdr((short) IEJoinInMemory.tableColNums.get(r1).intValue(), IEJoinInMemory.attrTypes.get(r1), null);
 					tempCopy.tupleCopy(temp);
 
-					_values.get(IEJoinEstimatorArrayType.L1).add(tempCopy);
-					_values.get(IEJoinEstimatorArrayType.L2).add(tempCopy);
+					_tempValues.get(IEJoinEstimatorArrayType.L1).add(tempCopy);
+					_tempValues.get(IEJoinEstimatorArrayType.L2).add(tempCopy);
 				}
 
 				while((temp = r2Scan.get_next()) != null && _values.get(IEJoinEstimatorArrayType.L1Prime).size() < r2Size){
 					tempCopy = new Tuple();
-					tempCopy.setHdr((short)4, _ATTR_TYPES, null);
+					tempCopy.setHdr((short) IEJoinInMemory.tableColNums.get(r2).intValue(), IEJoinInMemory.attrTypes.get(r2), null);
 					tempCopy.tupleCopy(temp);
 
-					_values.get(IEJoinEstimatorArrayType.L1Prime).add(tempCopy);
-					_values.get(IEJoinEstimatorArrayType.L2Prime).add(tempCopy);
+					_tempValues.get(IEJoinEstimatorArrayType.L1Prime).add(tempCopy);
+					_tempValues.get(IEJoinEstimatorArrayType.L2Prime).add(tempCopy);
 				}
+				
+				
+				//Invoking random function to get random values for estimation
+				Random r = new Random();
+				int Low = 0;
+				int High = r1Size-1;
+				List<Tuple> tuples = _tempValues.get(IEJoinEstimatorArrayType.L1);
+				for(int i=0;i<r1Size/percentage;i++){
+					int result = r.nextInt(High-Low) + Low;
+					_values.get(IEJoinEstimatorArrayType.L1).add(tuples.get(result));
+					_values.get(IEJoinEstimatorArrayType.L2).add(tuples.get(result));
+				}
+				
+				
+				High = r2Size-1;
+				List<Tuple> tuplesSecondTable = _tempValues.get(IEJoinEstimatorArrayType.L1Prime);
+				for(int i=0;i<r2Size/percentage;i++){
+					int result = r.nextInt(High-Low) + Low;
+					_values.get(IEJoinEstimatorArrayType.L1Prime).add(tuplesSecondTable.get(result));
+					_values.get(IEJoinEstimatorArrayType.L2Prime).add(tuplesSecondTable.get(result));
+				}
+				//Random Call end
+				
+				
 			} catch (JoinsException | InvalidTupleSizeException | InvalidTypeException | PageNotReadException
 					| PredEvalException | UnknowAttrType | FieldNumberOutOfBoundException | WrongPermat
 					| IOException | FileScanException | TupleUtilsException | InvalidRelation e) {
@@ -217,6 +230,8 @@ public class IEJoinEstimator extends Iterator{
 		_elements = new IEJoinEstimatorArray(r1, r2, r1c1, r2c1, r1c2, r2c2, op1, op2, r1Size, r2Size);
 		m = _elements.getR1Size();
 		n = _elements.getR2Size();
+		_r1 = r1;
+		_r2 = r2;
 
 		//line 7
 		permArr = new int[m];
@@ -409,8 +424,8 @@ public class IEJoinEstimator extends Iterator{
 					 */
 
 					Tuple out1 = new Tuple(), out2 = new Tuple();
-					out1.setHdr((short)4, _ATTR_TYPES, null);
-					out2.setHdr((short)4, _ATTR_TYPES, null);
+					out1.setHdr((short) IEJoinInMemory.tableColNums.get(_r1).intValue(), IEJoinInMemory.attrTypes.get(_r1), null);
+					out2.setHdr((short) IEJoinInMemory.tableColNums.get(_r2).intValue(), IEJoinInMemory.attrTypes.get(_r2), null);
 
 					out1.tupleCopy(l1);
 					out2.tupleCopy(l1Prime);
@@ -419,9 +434,9 @@ public class IEJoinEstimator extends Iterator{
 
 					outTuple.setHdr((short)projAttrs.length, projAttrs, null);
 
-					Projection.Join(out1, _ATTR_TYPES, out2, _ATTR_TYPES, outTuple, permMat, permMat.length);
+					Projection.Join(out1, IEJoinInMemory.attrTypes.get(_r1), out2, IEJoinInMemory.attrTypes.get(_r2), outTuple, permMat, permMat.length);
 
-					outTuple.print(projAttrs);
+					//outTuple.print(projAttrs);
 					numTuples++;
 
 					//result.add(outTuple);
