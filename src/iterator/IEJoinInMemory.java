@@ -416,6 +416,7 @@ public class IEJoinInMemory extends Iterator{
 
 		for(String key : _projRels.keySet()){
 			for(Integer col : _projRels.get(key)){
+
 				if(key.equals(_r2)){
 					spec = new RelSpec(RelSpec.innerRel);
 				}
@@ -423,7 +424,6 @@ public class IEJoinInMemory extends Iterator{
 					if(_r1.equals("intermediate")){
 						col = IEJoinInMemoryP4.getIntCol(key, col);
 					}
-
 					spec = new RelSpec(RelSpec.outer);
 				}
 
@@ -481,7 +481,7 @@ public class IEJoinInMemory extends Iterator{
 
 					Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
 
-				//	outTuple.print(projAttrs);
+					//	outTuple.print(projAttrs);
 
 					if(!saveResults){
 						outTuple.print(projAttrs);

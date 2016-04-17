@@ -20,7 +20,7 @@ public class BuilderTest {
 		
 		for(int i = 0; i < 5; i++)
 		{
-			long[] measures = hist[i].view_hist(3);
+			int[] measures = hist[i].view_hist(3);
 			System.out.print("{ ");
 			System.out.print(measures[0]);
 			for(int j = 1; j < measures.length; j++)
