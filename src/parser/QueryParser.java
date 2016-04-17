@@ -6,15 +6,6 @@ import java.util.Scanner;
 
 import global.AttrOperator;
 
-/*
-SELECT count(*)
-FROM F1 r, F2 s, F3 t, F4 v, F5 w
-WHERE r.salary > s.salary AND r.tax < s.tax
-AND s.start < t.end AND s.end > t.start
-AND t.salary > v.salary AND t.tax < v.tax
-AND v.start < w.end AND v.end > w.start;
- */
-
 public abstract class QueryParser {
 	public static Query parse(String filepath) throws FileNotFoundException{
 		Query query = new Query();
