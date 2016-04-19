@@ -407,38 +407,48 @@ public class IEJoinInMemory extends Iterator{
 		}
 
 		Tuple l1 = null, l1Prime = null, outTuple;
-		int off2, off1, k;
+		int off2, off1, k, keyCol;
 
-		List<FldSpec> projMat = new ArrayList<FldSpec>();
+		Map<Integer, FldSpec> projMap = new HashMap<Integer, FldSpec>();
 		FldSpec[] permMat;
 		RelSpec spec;
 		AttrType[] projAttrs; 
-
+		
 		for(String key : _projRels.keySet()){
 			for(Integer col : _projRels.get(key)){
-
+				if((keyCol = IEJoinInMemoryP4.getIntCol(key, col)) == -1){
+					keyCol = col;
+				}
+				
 				if(key.equals(_r2)){
 					spec = new RelSpec(RelSpec.innerRel);
 				}
 				else{
-					if(_r1.equals("intermediate")){
-						col = IEJoinInMemoryP4.getIntCol(key, col);
-					}
 					spec = new RelSpec(RelSpec.outer);
 				}
+				
+				if(_r1.equals("intermediate") && keyCol != col){
+					projMap.put(col, new FldSpec(new RelSpec(RelSpec.outer), col));
+				}
 
-				projMat.add(new FldSpec(spec, col));
+				projMap.put(keyCol, new FldSpec(spec, col));
+				//projMat.add(keyCol, new FldSpec(spec, col));
+				//projMat.add(new FldSpec(spec, col));
 			}
 		}
+		
+		permMat = new FldSpec[projMap.size()];
+		
+		for(Integer key : projMap.keySet()){
+			permMat[key - 1] = projMap.get(key);
+		}
 
-		projAttrs = new AttrType[projMat.size()];
+		projAttrs = new AttrType[permMat.length];
 
 		for(int i = 0; i < projAttrs.length; i++){
 			projAttrs[i] = new AttrType(AttrType.attrInteger);
 		}	
 
-		permMat = new FldSpec[projMat.size()];
-		projMat.toArray(permMat);
 		int numTuples = 0;
 
 		for(int i = 0; i < l2Offset.length; i++){
@@ -480,6 +490,12 @@ public class IEJoinInMemory extends Iterator{
 					outTuple.setHdr((short)projAttrs.length, projAttrs, null);
 
 					Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
+
+					/*
+					System.out.println("Tuple 1: " + out1);
+					System.out.println("Tuple 2: " + out2);
+					System.out.println("Out Tuple: " + outTuple);
+					*/
 
 					//	outTuple.print(projAttrs);
 

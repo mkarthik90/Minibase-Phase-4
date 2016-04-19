@@ -110,10 +110,18 @@ public class IEJoinInMemoryP4 {
 	}
 
 	public static int getIntCol(QueryRel rel){
-		return intermediateCols.get(rel.table).get(rel.col);
+		return getIntCol(rel.table, rel.col);
 	}
 	
 	public static int getIntCol(String table, int col){
-		return intermediateCols.get(table).get(col);
+		int val = -1;
+		
+		if(intermediateCols.containsKey(table)){
+			if(intermediateCols.get(table).containsKey(col)){
+				val = intermediateCols.get(table).get(col);
+			}
+		}
+		
+		return val;
 	}
 }
