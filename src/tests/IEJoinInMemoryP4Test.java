@@ -9,10 +9,11 @@ public class IEJoinInMemoryP4Test {
 		try {
 			DBBuilderP4.build();
 			//DBBuilder.build();
-			Query query = QueryParser.parse("queries/p4/query_3a.txt");
+			Query query = QueryParser.parse("queries/p4/query_2a.txt");
 			IEJoinInMemoryP4 test = new IEJoinInMemoryP4(query, false);
-		
-			System.out.println(test);
+			
+			System.out.println("Number of tuples: " + test.getNumTuples());
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

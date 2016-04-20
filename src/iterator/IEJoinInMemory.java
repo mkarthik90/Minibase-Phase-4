@@ -389,15 +389,15 @@ public class IEJoinInMemory extends Iterator{
 		}
 	}
 
-	public void getResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
-		this._getResult(false, "");
+	public int getResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
+		return this._getResult(false, "");
 	}
 
-	public void writeResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
-		this._getResult(true, "intermediate");
+	public int writeResult() throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
+		return this._getResult(true, "intermediate");
 	}
 
-	private void _getResult(boolean saveResults, String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
+	private int _getResult(boolean saveResults, String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
 		if(saveResults){
 			if(hFile != null){
 				hFile.deleteFile();
@@ -414,24 +414,40 @@ public class IEJoinInMemory extends Iterator{
 		RelSpec spec;
 		AttrType[] projAttrs; 
 
-		for(String key : _projRels.keySet()){
-			for(Integer col : _projRels.get(key)){
-				if((keyCol = IEJoinInMemoryP4.getIntCol(key, col)) == -1){
-					keyCol = col;
-				}
+		if(!saveResults){
+			for(String key : _projRels.keySet()){
+				for(Integer col : _projRels.get(key)){
+					if(key.equals(_r1)){
+						spec = new RelSpec(RelSpec.outer);
+					}
+					else{
+						spec = new RelSpec(RelSpec.innerRel);
+					}
 
-				if(key.equals(_r2)){
-					spec = new RelSpec(RelSpec.innerRel);
+					projMap.put(col, new FldSpec(spec, col));
 				}
-				else{
-					spec = new RelSpec(RelSpec.outer);
-				}
+			}
+		}
+		else{
+			for(String key : _projRels.keySet()){
+				for(Integer col : _projRels.get(key)){
+					if((keyCol = IEJoinInMemoryP4.getIntCol(key, col)) == -1){
+						keyCol = col;
+					}
 
-				if(_r1.equals("intermediate") && keyCol != col){
-					projMap.put(col, new FldSpec(new RelSpec(RelSpec.outer), col));
-				}
+					if(key.equals(_r2)){
+						spec = new RelSpec(RelSpec.innerRel);
+					}
+					else{
+						spec = new RelSpec(RelSpec.outer);
+					}
 
-				projMap.put(keyCol, new FldSpec(spec, col));
+					if(_r1.equals("intermediate") && keyCol != col){
+						projMap.put(col, new FldSpec(new RelSpec(RelSpec.outer), col));
+					}
+
+					projMap.put(keyCol, new FldSpec(spec, col));
+				}
 			}
 		}
 
@@ -487,8 +503,12 @@ public class IEJoinInMemory extends Iterator{
 					outTuple = new Tuple();
 					outTuple.setHdr((short)projAttrs.length, projAttrs, null);
 
-					combine(out1, out2, outTuple);
-					//Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
+					if(saveResults){
+						combine(out1, out2, outTuple);
+					}
+					else{
+						Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
+					}
 
 					/*
 					System.out.println("Tuple 1: " + out1);
@@ -513,8 +533,8 @@ public class IEJoinInMemory extends Iterator{
 			}
 		}
 
-		System.out.println("Number of tuples: " + numTuples);
-		//return result;
+		//System.out.println("Number of tuples: " + numTuples);
+		return numTuples;
 	}
 
 	private void combine(Tuple t1, Tuple t2, Tuple out) throws FieldNumberOutOfBoundException, IOException{

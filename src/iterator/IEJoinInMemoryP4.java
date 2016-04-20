@@ -29,7 +29,7 @@ import tests.DBBuilderP4;
 public class IEJoinInMemoryP4 {
 	private Map<String, Set<Integer>> _allProjRels;
 	public static Map<String, Map<Integer, Integer>> intermediateCols;
-	private int _currIntCol;
+	private int _currIntCol, _numTuples;
 
 	public IEJoinInMemoryP4(Query query, boolean onDisk) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
 		Set<String> inIntermediate = new HashSet<String>();
@@ -70,7 +70,7 @@ public class IEJoinInMemoryP4 {
 			}
 			 */
 
-			int col1, col2, numTuples;
+			int col1, col2;
 
 			col1 = getIntCol(pred1.leftRel);
 			leftIntRel = new QueryRel("intermediate", col1);
@@ -82,8 +82,7 @@ public class IEJoinInMemoryP4 {
 				rightIntRel = new QueryRel("intermediate", col2);
 				pred1.rightRel = rightIntRel;
 
-				numTuples = compareIntermediateTuples(col1, col2, pred1.op.attrOperator);
-				System.out.println("Number of tuples: " + numTuples);
+				_numTuples = compareIntermediateTuples(col1, col2, pred1.op.attrOperator);
 			}
 			else{
 				if(!pred1.rightRel.table.equals("intermediate")){
@@ -95,7 +94,7 @@ public class IEJoinInMemoryP4 {
 				}
 
 				join = IEJoinInMemory.fromPred(pred1, pred1.clone(), _allProjRels);
-				join.writeResult();
+				_numTuples = join.writeResult();
 			}
 
 			/*
@@ -105,6 +104,10 @@ public class IEJoinInMemoryP4 {
 			 */
 
 		}
+	}
+	
+	public int getNumTuples(){
+		return _numTuples;
 	}
 
 	private void _populateProjRels(Query query) {
