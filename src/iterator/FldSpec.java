@@ -1,5 +1,4 @@
 package iterator;
-import heap.*;
 
 public class FldSpec {
 	public  RelSpec relation;
@@ -14,7 +13,7 @@ public class FldSpec {
 		relation = _relation;
 		offset = _offset;
 	}
-	
+
 	@Override
 	public String toString(){
 		return Integer.toString(offset);

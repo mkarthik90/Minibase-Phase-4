@@ -1,19 +1,30 @@
 package iterator;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import bufmgr.PageNotReadException;
 import global.AttrType;
+import heap.FieldNumberOutOfBoundException;
+import heap.FileAlreadyDeletedException;
+import heap.HFBufMgrException;
+import heap.HFDiskMgrException;
+import heap.InvalidSlotNumberException;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
+import heap.Tuple;
 import index.IndexException;
 import parser.Query;
 import parser.QueryPred;
 import parser.QueryRel;
+import tests.DBBuilderP4;
 
 public class IEJoinInMemoryP4 {
 	private Map<String, Set<Integer>> _allProjRels;
@@ -21,20 +32,24 @@ public class IEJoinInMemoryP4 {
 	private int _currIntCol;
 
 	public IEJoinInMemoryP4(Query query, boolean onDisk) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, PredEvalException, LowMemException, UnknowAttrType, UnknownKeyTypeException, Exception{
+		Set<String> inIntermediate = new HashSet<String>();
 		_currIntCol = 1;
 		intermediateCols = new LinkedHashMap<String, Map<Integer, Integer>>();
 		_populateProjRels(query);
 		_setIntCols();
 
 		QueryPred pred1, pred2;
-		QueryRel intRel;
+		QueryRel leftIntRel, rightIntRel;
 		Iterator<QueryPred> it = query.where.iterator();
-		int col;
 
 		pred1 = it.next();
+		inIntermediate.add(pred1.leftRel.table);
+		inIntermediate.add(pred1.rightRel.table);
 
 		if(it.hasNext()){
 			pred2 = it.next();
+			inIntermediate.add(pred2.leftRel.table);
+			inIntermediate.add(pred2.rightRel.table);
 		}
 		else{
 			throw new IllegalArgumentException("Not enough predicates in query.");
@@ -46,23 +61,49 @@ public class IEJoinInMemoryP4 {
 		while(it.hasNext()){
 			pred1 = it.next();
 
+			/*
 			if(it.hasNext()){
 				pred2 = it.next();
 			}
 			else{
 				throw new IllegalArgumentException("Not enough predicates in query.");
 			}
+			 */
 
-			col = getIntCol(pred1.leftRel);
-			intRel = new QueryRel("intermediate", col);
-			pred1.leftRel = intRel;
+			int col1, col2, numTuples;
 
+			col1 = getIntCol(pred1.leftRel);
+			leftIntRel = new QueryRel("intermediate", col1);
+			pred1.leftRel = leftIntRel;
+
+
+			if (inIntermediate.contains(pred1.rightRel.table)){
+				col2 = getIntCol(pred1.rightRel);
+				rightIntRel = new QueryRel("intermediate", col2);
+				pred1.rightRel = rightIntRel;
+
+				numTuples = compareIntermediateTuples(col1, col2, pred1.op.attrOperator);
+				System.out.println("Number of tuples: " + numTuples);
+			}
+			else{
+				if(!pred1.rightRel.table.equals("intermediate")){
+					inIntermediate.add(pred1.rightRel.table);
+				}
+
+				if(!pred1.leftRel.table.equals("intermediate")){
+					inIntermediate.add(pred1.leftRel.table);
+				}
+
+				join = IEJoinInMemory.fromPred(pred1, pred1.clone(), _allProjRels);
+				join.writeResult();
+			}
+
+			/*
 			col = getIntCol(pred2.leftRel);
-			intRel = new QueryRel("intermediate", col);
-			pred2.leftRel = intRel;
+			leftIntRel = new QueryRel("intermediate", col);
+			pred2.leftRel = leftIntRel;
+			 */
 
-			join = IEJoinInMemory.fromPred(pred1, pred2, _allProjRels);
-			join.writeResult();
 		}
 	}
 
@@ -112,16 +153,58 @@ public class IEJoinInMemoryP4 {
 	public static int getIntCol(QueryRel rel){
 		return getIntCol(rel.table, rel.col);
 	}
-	
+
 	public static int getIntCol(String table, int col){
 		int val = -1;
-		
+
 		if(intermediateCols.containsKey(table)){
 			if(intermediateCols.get(table).containsKey(col)){
 				val = intermediateCols.get(table).get(col);
 			}
 		}
-		
+
 		return val;
+	}
+
+	private static int compareIntermediateTuples(int col1, int col2, int op){
+		int numTuples = 0;
+
+		try {
+			Tuple t;
+			int val1, val2;
+			List<Tuple> intTuples = new ArrayList<Tuple>();
+			FileScan scan = new FileScan("intermediate.in", IEJoinInMemory.attrTypes.get("intermediate"), null, (short) IEJoinInMemory.tableColNums.get("intermediate").intValue(), (short) IEJoinInMemory.tableColNums.get("intermediate").intValue(), IEJoinInMemory.basicProjections.get("intermediate"), null);
+
+			while((t = scan.get_next()) != null){
+				Tuple tempCopy = new Tuple();
+				tempCopy = new Tuple();
+				tempCopy.setHdr((short) IEJoinInMemory.tableColNums.get("intermediate").intValue(), IEJoinInMemory.attrTypes.get("intermediate"), null);
+				tempCopy.tupleCopy(t);
+
+				intTuples.add(tempCopy);
+			}
+
+			if(IEJoinInMemory.hFile != null){
+				IEJoinInMemory.hFile.deleteFile();
+			}
+
+			IEJoinInMemory.hFile = DBBuilderP4.make_new_heap("intermediate");
+
+			for(Tuple temp : intTuples){
+				val1 = temp.getIntFld(col1);
+				val2 = temp.getIntFld(col2);
+
+				if(IEJoinInMemory.evaluate(val1, op, val2)){
+					DBBuilderP4.insert_tuple(IEJoinInMemory.hFile, temp);
+					numTuples++;
+				}
+			}
+
+		} catch (FileScanException | TupleUtilsException | InvalidRelation | IOException | JoinsException | InvalidTupleSizeException | InvalidTypeException | PageNotReadException | PredEvalException | UnknowAttrType | FieldNumberOutOfBoundException | WrongPermat | InvalidSlotNumberException | FileAlreadyDeletedException | HFBufMgrException | HFDiskMgrException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+
+		return numTuples;
 	}
 }

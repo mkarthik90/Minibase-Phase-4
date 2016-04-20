@@ -58,7 +58,7 @@ public class IEJoinInMemory extends Iterator{
 	private String _r1, _r2;
 	private Map<String, Set<Integer>> _projRels;
 	private IEJoinInMemoryArray _elements;
-	private static Heapfile _hFile = null;
+	public static Heapfile hFile = null;
 
 	enum IEJoinInMemoryArrayType{
 		L1, L1Prime, L2, L2Prime;
@@ -399,11 +399,11 @@ public class IEJoinInMemory extends Iterator{
 
 	private void _getResult(boolean saveResults, String filename) throws JoinsException, IndexException, InvalidTupleSizeException, InvalidTypeException, PageNotReadException, TupleUtilsException, PredEvalException, SortException, LowMemException, UnknowAttrType, UnknownKeyTypeException, IOException, Exception{
 		if(saveResults){
-			if(_hFile != null){
-				_hFile.deleteFile();
+			if(hFile != null){
+				hFile.deleteFile();
 			}
 
-			_hFile = DBBuilderP4.make_new_heap(filename);
+			hFile = DBBuilderP4.make_new_heap(filename);
 		}
 
 		Tuple l1 = null, l1Prime = null, outTuple;
@@ -413,32 +413,30 @@ public class IEJoinInMemory extends Iterator{
 		FldSpec[] permMat;
 		RelSpec spec;
 		AttrType[] projAttrs; 
-		
+
 		for(String key : _projRels.keySet()){
 			for(Integer col : _projRels.get(key)){
 				if((keyCol = IEJoinInMemoryP4.getIntCol(key, col)) == -1){
 					keyCol = col;
 				}
-				
+
 				if(key.equals(_r2)){
 					spec = new RelSpec(RelSpec.innerRel);
 				}
 				else{
 					spec = new RelSpec(RelSpec.outer);
 				}
-				
+
 				if(_r1.equals("intermediate") && keyCol != col){
 					projMap.put(col, new FldSpec(new RelSpec(RelSpec.outer), col));
 				}
 
 				projMap.put(keyCol, new FldSpec(spec, col));
-				//projMat.add(keyCol, new FldSpec(spec, col));
-				//projMat.add(new FldSpec(spec, col));
 			}
 		}
-		
+
 		permMat = new FldSpec[projMap.size()];
-		
+
 		for(Integer key : projMap.keySet()){
 			permMat[key - 1] = projMap.get(key);
 		}
@@ -481,7 +479,7 @@ public class IEJoinInMemory extends Iterator{
 					int p1Out1 = out1.getIntFld(_r1c1), p1Out2 = out1.getIntFld(_r1c2),
 							p2Out1 = out2.getIntFld(_r2c1), p2Out2 = out2.getIntFld(_r2c2);
 
-					if(!_evaluate(p1Out1, _op1, p2Out1) || !_evaluate(p1Out2, _op2, p2Out2)){
+					if(!evaluate(p1Out1, _op1, p2Out1) || !evaluate(p1Out2, _op2, p2Out2)){
 						k++;
 						continue;
 					}
@@ -489,13 +487,14 @@ public class IEJoinInMemory extends Iterator{
 					outTuple = new Tuple();
 					outTuple.setHdr((short)projAttrs.length, projAttrs, null);
 
-					Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
+					combine(out1, out2, outTuple);
+					//Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
 
 					/*
 					System.out.println("Tuple 1: " + out1);
 					System.out.println("Tuple 2: " + out2);
 					System.out.println("Out Tuple: " + outTuple);
-					*/
+					 */
 
 					//	outTuple.print(projAttrs);
 
@@ -503,7 +502,7 @@ public class IEJoinInMemory extends Iterator{
 						outTuple.print(projAttrs);
 					}
 					else{
-						DBBuilderP4.insert_tuple(_hFile, outTuple);
+						DBBuilderP4.insert_tuple(hFile, outTuple);
 						//hFile.insertRecord(outTuple.returnTupleByteArray());
 					}
 
@@ -518,7 +517,41 @@ public class IEJoinInMemory extends Iterator{
 		//return result;
 	}
 
-	private boolean _evaluate(int op1, int op, int op2) throws IllegalArgumentException{
+	private void combine(Tuple t1, Tuple t2, Tuple out) throws FieldNumberOutOfBoundException, IOException{
+		Set<Integer> r1Set, r2Set;
+		int keyCol;
+
+		for(int i = 0; i < out.noOfFlds(); i++){
+			out.setIntFld(i+1, Integer.MIN_VALUE);
+		}
+
+		if(_r1.equals("intermediate")){
+			for(String table : _projRels.keySet()){
+				for(Integer col : _projRels.get(table)){
+					keyCol = IEJoinInMemoryP4.getIntCol(table, col);
+					out.setIntFld(keyCol, t1.getIntFld(keyCol));
+				}
+			}
+		}
+		else{
+			r1Set = _projRels.get(_r1);
+
+			for(Integer col : r1Set){
+				keyCol = IEJoinInMemoryP4.getIntCol(_r1, col);
+				out.setIntFld(keyCol, t1.getIntFld(col));
+			}
+		}
+
+		r2Set = _projRels.get(_r2);
+
+		for(Integer col : r2Set){
+			keyCol = IEJoinInMemoryP4.getIntCol(_r2, col);
+
+			out.setIntFld(keyCol, t2.getIntFld(col));
+		}
+	}
+
+	public static boolean evaluate(int op1, int op, int op2) throws IllegalArgumentException{
 		boolean valid;
 
 		switch(op){
