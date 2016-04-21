@@ -139,6 +139,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			
 			System.out.println(q.toString());
 			IEJoinInMemoryP4 ieJoinP4 = new IEJoinInMemoryP4(q, true);
+			System.out.println("Num Tuples: " + ieJoinP4.getNumTuples());
 
 		} catch (Exception e) {
 			e.printStackTrace();
