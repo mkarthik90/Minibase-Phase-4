@@ -374,7 +374,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 public class SelectivityEstimatorTest {
 	public static void main(String argv[]) {
 
-		int[] sizeOfTables = DBBuilderP4.build();
+		int[] sizeOfTables = DBBuilderP4.buildNumTuples(300);
 		
 		boolean sortstatus = IEJoinInMemorySelectivityEstimate.runTests(sizeOfTables);
 

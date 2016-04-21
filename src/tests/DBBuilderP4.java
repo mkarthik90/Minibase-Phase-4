@@ -164,7 +164,6 @@ public class DBBuilderP4 implements GlobalConst{
 		RTable3 = new ArrayList<TableEntry3>();
 		RTable4 = new ArrayList<TableEntry4>();
 		RTable5 = new ArrayList<TableEntry5>();
-		Histogram hist[] = new Histogram[5];
 		String fndb = "datasetsPhase4/";
 		String line;
 		String parts[];
@@ -1511,6 +1510,464 @@ public class DBBuilderP4 implements GlobalConst{
 		return hist;
 	}
 	
+	public static int[] buildNumTuples(int numTuples){
+		RTable1 = new ArrayList<TableEntry1>();
+		RTable2 = new ArrayList<TableEntry2>();
+		RTable3 = new ArrayList<TableEntry3>();
+		RTable4 = new ArrayList<TableEntry4>();
+		RTable5 = new ArrayList<TableEntry5>();
+		String fndb = "datasetsPhase4/";
+		String line;
+		String parts[];
+		int r1 = 0;
+		int r2 = 0;
+		int r3 = 0;
+		int r4 = 0;
+		int r5 = 0;
+		int r6 = 0;
+		int r7 = 0;
+		int currNumTuples;
+		TableEntry1 te1;
+		TableEntry2 te2;
+		TableEntry3 te3;
+		TableEntry4 te4;
+		TableEntry5 te5;
+		
+		//read files=====================================================================================================
+		//F1----------------------------------------------------------------------
+		currNumTuples = 0;
+		
+		try{
+			FileReader fr = new FileReader(fndb + fn1 + ".csv");
+			BufferedReader bufferedReader = new BufferedReader(fr);
+			while(currNumTuples < numTuples && (line = bufferedReader.readLine()) != null) 
+			{
+				currNumTuples++;
+				parts = line.split(",");
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				te1 = new TableEntry1(r1,r2,r3,r4);
+				RTable1.add(te1);
+			}
+			bufferedReader.close();
+		}
+		catch(FileNotFoundException ex)
+		{
+			System.out.println("Unable to open file ");
+		} catch (IOException e) 
+		{
+			System.out.println("Error");
+		}
+
+
+		String dbpath = "/tmp/"+System.getProperty("user.name")+".minibase.jointestdb"; 
+		String logpath = "/tmp/"+System.getProperty("user.name")+".joinlog";
+
+		String remove_cmd = "/bin/rm -rf ";
+		String remove_logcmd = remove_cmd + logpath;
+		String remove_dbcmd = remove_cmd + dbpath;
+		String remove_joincmd = remove_cmd + dbpath;
+
+		try {
+			Runtime.getRuntime().exec(remove_logcmd);
+			Runtime.getRuntime().exec(remove_dbcmd);
+			Runtime.getRuntime().exec(remove_joincmd);
+		}
+		catch (IOException e) {
+			System.err.println (""+e);
+		}
+		new SystemDefs( dbpath, 1000, NUMBUF, "Clock" );
+
+		short [] Ssizes = null;
+
+		Tuple t = new Tuple();
+
+		try {
+			t.setHdr((short) 4,TableEntry1.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		int size = t.size();
+
+		Heapfile        f = null;
+		try {
+			f = new Heapfile(fn1 + ".in");
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Heapfile constructor ***");
+			e.printStackTrace();
+		}
+
+		t = new Tuple(size);
+		try {
+			t.setHdr((short) 4, TableEntry1.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		for (int i=0; i<RTable1.size(); i++) {
+			try {
+				t.setIntFld(1, ((TableEntry1)RTable1.get(i)).rel1);
+				t.setIntFld(2, ((TableEntry1)RTable1.get(i)).rel2);
+				t.setIntFld(3, ((TableEntry1)RTable1.get(i)).rel3);
+				t.setIntFld(4, ((TableEntry1)RTable1.get(i)).rel4);
+			}
+			catch (Exception e) {
+				System.err.println("*** Heapfile error in Tuple.setStrFld() ***");
+				e.printStackTrace();
+			}
+
+			try {
+				f.insertRecord(t.returnTupleByteArray());
+			}
+			catch (Exception e) {
+				System.err.println("*** error in Heapfile.insertRecord() ***");
+				e.printStackTrace();
+			}      
+		}
+		
+		//F2--------------------------------------------------------------------------------------
+		try{
+			currNumTuples = 0;
+			FileReader fr = new FileReader(fndb + fn2 + ".csv");
+			BufferedReader bufferedReader = new BufferedReader(fr);
+			while(currNumTuples < numTuples && (line = bufferedReader.readLine()) != null) 
+			{
+				currNumTuples++;
+				parts = line.split(",");
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
+				te2 = new TableEntry2(r1,r2,r3,r4,r5,r6,r7);
+				RTable2.add(te2);
+			}
+			bufferedReader.close();
+		}
+		catch(FileNotFoundException ex)
+		{
+			System.out.println("Unable to open file ");
+		} catch (IOException e) 
+		{
+			System.out.println("Error");
+		}
+
+		t = new Tuple();
+
+		try {
+			t.setHdr((short) 7,TableEntry2.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		size = t.size();
+
+		f = null;
+		try {
+			f = new Heapfile(fn2 + ".in");
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Heapfile constructor ***");
+			e.printStackTrace();
+		}
+
+		t = new Tuple(size);
+		try {
+			t.setHdr((short) 7, TableEntry2.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		for (int i=0; i<RTable2.size(); i++) {
+			try {
+				t.setIntFld(1, ((TableEntry2)RTable2.get(i)).rel1);
+				t.setIntFld(2, ((TableEntry2)RTable2.get(i)).rel2);
+				t.setIntFld(3, ((TableEntry2)RTable2.get(i)).rel3);
+				t.setIntFld(4, ((TableEntry2)RTable2.get(i)).rel4);
+				t.setIntFld(5, ((TableEntry2)RTable2.get(i)).rel5);
+				t.setIntFld(6, ((TableEntry2)RTable2.get(i)).rel6);
+				t.setIntFld(7, ((TableEntry2)RTable2.get(i)).rel7);
+			}
+			catch (Exception e) {
+				System.err.println("*** Heapfile error in Tuple.setStrFld() ***");
+				e.printStackTrace();
+			}
+
+			try {
+				f.insertRecord(t.returnTupleByteArray());
+			}
+			catch (Exception e) {
+				System.err.println("*** error in Heapfile.insertRecord() ***");
+				e.printStackTrace();
+			}      
+		}	
+		
+		//F3--------------------------------------------------------------------------------------
+		try{
+			currNumTuples = 0;
+			FileReader fr = new FileReader(fndb + fn3 + ".csv");
+			BufferedReader bufferedReader = new BufferedReader(fr);
+			while(currNumTuples < numTuples && (line = bufferedReader.readLine()) != null) 
+			{
+				currNumTuples++;
+				parts = line.split(",");
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
+				te3 = new TableEntry3(r1,r2,r3,r4,r5,r6,r7);
+				RTable3.add(te3);
+			}
+			bufferedReader.close();
+		}
+		catch(FileNotFoundException ex)
+		{
+			System.out.println("Unable to open file ");
+		} catch (IOException e) 
+		{
+			System.out.println("Error");
+		}
+
+
+		t = new Tuple();
+
+		try {
+			t.setHdr((short) 7, TableEntry3.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		size = t.size();
+
+		f = null;
+		try {
+			f = new Heapfile(fn3 + ".in");
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Heapfile constructor ***");
+			e.printStackTrace();
+		}
+
+		t = new Tuple(size);
+		try {
+			t.setHdr((short) 7, TableEntry3.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		for (int i=0; i<RTable3.size(); i++) {
+			try {
+				t.setIntFld(1, ((TableEntry3)RTable3.get(i)).rel1);
+				t.setIntFld(2, ((TableEntry3)RTable3.get(i)).rel2);
+				t.setIntFld(3, ((TableEntry3)RTable3.get(i)).rel3);
+				t.setIntFld(4, ((TableEntry3)RTable3.get(i)).rel4);
+				t.setIntFld(5, ((TableEntry3)RTable3.get(i)).rel5);
+				t.setIntFld(6, ((TableEntry3)RTable3.get(i)).rel6);
+				t.setIntFld(7, ((TableEntry3)RTable3.get(i)).rel7);
+			}
+			catch (Exception e) {
+				System.err.println("*** Heapfile error in Tuple.setStrFld() ***");
+				e.printStackTrace();
+			}
+
+			try {
+				f.insertRecord(t.returnTupleByteArray());
+			}
+			catch (Exception e) {
+				System.err.println("*** error in Heapfile.insertRecord() ***");
+				e.printStackTrace();
+			}      
+		}
+		
+		//F4--------------------------------------------------------------------------------------
+		currNumTuples = 0;
+		try{
+			FileReader fr = new FileReader(fndb + fn4 + ".csv");
+			BufferedReader bufferedReader = new BufferedReader(fr);
+			while(currNumTuples < numTuples && (line = bufferedReader.readLine()) != null) 
+			{
+				currNumTuples++;
+				parts = line.split(",");
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				r4 = Integer.parseInt(parts[3]);
+				r5 = Integer.parseInt(parts[4]);
+				r6 = Integer.parseInt(parts[5]);
+				r7 = Integer.parseInt(parts[6]);
+				te4 = new TableEntry4(r1,r2,r3,r4,r5,r6,r7);
+				RTable4.add(te4);
+			}
+			bufferedReader.close();
+		}
+		catch(FileNotFoundException ex)
+		{
+			System.out.println("Unable to open file ");
+		} catch (IOException e) 
+		{
+			System.out.println("Error");
+		}
+
+		t = new Tuple();
+
+		try {
+			t.setHdr((short) 7, TableEntry4.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		size = t.size();
+
+		f = null;
+		try {
+			f = new Heapfile(fn4 + ".in");
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Heapfile constructor ***");
+			e.printStackTrace();
+		}
+
+		t = new Tuple(size);
+		try {
+			t.setHdr((short) 7, TableEntry4.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		for (int i=0; i<RTable4.size(); i++) {
+			try {
+				t.setIntFld(1, ((TableEntry4)RTable4.get(i)).rel1);
+				t.setIntFld(2, ((TableEntry4)RTable4.get(i)).rel2);
+				t.setIntFld(3, ((TableEntry4)RTable4.get(i)).rel3);
+				t.setIntFld(4, ((TableEntry4)RTable4.get(i)).rel4);
+				t.setIntFld(5, ((TableEntry4)RTable4.get(i)).rel5);
+				t.setIntFld(6, ((TableEntry4)RTable4.get(i)).rel6);
+				t.setIntFld(7, ((TableEntry4)RTable4.get(i)).rel7);
+			}
+			catch (Exception e) {
+				System.err.println("*** Heapfile error in Tuple.setStrFld() ***");
+				e.printStackTrace();
+			}
+
+			try {
+				f.insertRecord(t.returnTupleByteArray());
+			}
+			catch (Exception e) {
+				System.err.println("*** error in Heapfile.insertRecord() ***");
+				e.printStackTrace();
+			}      
+		}
+
+		//F5--------------------------------------------------------------------------------------
+		currNumTuples = 0;
+		try{
+			FileReader fr = new FileReader(fndb + fn5 + ".csv");
+			BufferedReader bufferedReader = new BufferedReader(fr);
+			while(currNumTuples < numTuples && (line = bufferedReader.readLine()) != null) 
+			{
+				currNumTuples++;
+				parts = line.split(",");
+				r1 = Integer.parseInt(parts[0]);
+				r2 = Integer.parseInt(parts[1]);
+				r3 = Integer.parseInt(parts[2]);
+				te5 = new TableEntry5(r1,r2,r3);
+				RTable5.add(te5);
+			}
+			bufferedReader.close();
+		}
+		catch(FileNotFoundException ex)
+		{
+			System.out.println("Unable to open file ");
+		} catch (IOException e) 
+		{
+			System.out.println("Error");
+		}
+		
+		t = new Tuple();
+
+		try {
+			t.setHdr((short) 3, TableEntry5.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		size = t.size();
+
+		f = null;
+		try {
+			f = new Heapfile(fn5 + ".in");
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Heapfile constructor ***");
+			e.printStackTrace();
+		}
+
+		t = new Tuple(size);
+		try {
+			t.setHdr((short) 3, TableEntry5.at, Ssizes);
+		}
+		catch (Exception e) {
+			System.err.println("*** error in Tuple.setHdr() ***");
+			e.printStackTrace();
+		}
+
+		for (int i=0; i<RTable5.size(); i++) {
+			try {
+				t.setIntFld(1, ((TableEntry5)RTable5.get(i)).rel1);
+				t.setIntFld(2, ((TableEntry5)RTable5.get(i)).rel2);
+				t.setIntFld(3, ((TableEntry5)RTable5.get(i)).rel3);
+			}
+			catch (Exception e) {
+				System.err.println("*** Heapfile error in Tuple.setStrFld() ***");
+				e.printStackTrace();
+			}
+
+			try {
+				f.insertRecord(t.returnTupleByteArray());
+			}
+			catch (Exception e) {
+				System.err.println("*** error in Heapfile.insertRecord() ***");
+				e.printStackTrace();
+			}      
+		}
+		
+		int sizes[] = new int[5];
+		sizes[0] = RTable1.size();
+		sizes[1] = RTable2.size();
+		sizes[2] = RTable3.size();
+		sizes[3] = RTable4.size();
+		sizes[4] = RTable5.size();
+		
+		return sizes;
+	}
+	
 	
 	public static Heapfile make_new_heap(String fn)
 	{
@@ -1531,7 +1988,7 @@ public class DBBuilderP4 implements GlobalConst{
 			System.err.println (""+e);
 		}
 
-		Tuple t = new Tuple();
+		new Tuple();
 
 		try{
 			Runtime.getRuntime().exec("rm " + fn + ".in");
