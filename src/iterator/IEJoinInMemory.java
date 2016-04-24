@@ -549,7 +549,7 @@ public class IEJoinInMemory extends Iterator{
 			}
 		}
 
-		System.out.println("Number of tuples: " + numTuples);
+		//System.out.println("Number of tuples: " + numTuples);
 		return numTuples;
 	}
 
