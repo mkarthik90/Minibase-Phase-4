@@ -104,6 +104,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 	public static boolean runTests(int[] sizeOfTables) {
 		try {
 			_sizeOfTables = sizeOfTables;
+			long startTime = System.currentTimeMillis();
 			int[] result = query2c_estimate();
 			int minimumValue = 0, minimumValuePosition = 0;
 			
@@ -195,6 +196,9 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			}
 			IEJoinInMemoryP4 ieJoinP4 = new IEJoinInMemoryP4(q2, true);
 			System.out.println("Num Tuples: " + ieJoinP4.getNumTuples());
+			long endTime = System.currentTimeMillis();
+			long difference = endTime - startTime;
+			System.out.println("Time taken"+difference);
 
 		} catch (Exception e) {
 			e.printStackTrace();
