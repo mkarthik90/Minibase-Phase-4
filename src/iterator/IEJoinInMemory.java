@@ -537,7 +537,6 @@ public class IEJoinInMemory extends Iterator{
 						outTuple.print(projAttrs);
 					}
 					else{
-						outTuple.print(projAttrs);
 						intermediateTable.add(outTuple);
 						//DBBuilderP4.insert_tuple(hFile, outTuple);
 						//hFile.insertRecord(outTuple.returnTupleByteArray());
@@ -550,7 +549,7 @@ public class IEJoinInMemory extends Iterator{
 			}
 		}
 
-		//System.out.println("Number of tuples: " + numTuples);
+		System.out.println("Number of tuples: " + numTuples);
 		return numTuples;
 	}
 
