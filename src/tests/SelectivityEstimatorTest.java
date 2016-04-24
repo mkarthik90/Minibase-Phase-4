@@ -106,7 +106,11 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			_sizeOfTables = sizeOfTables;
 			int[] result = query2c_estimate();
 			int minimumValue = 0, minimumValuePosition = 0;
-			// TODO
+			
+			//query2c_estimate();
+			
+			//int[] result = {35,30,15,17};
+			
 			for (int i = 0; i < result.length; i++) {
 
 				if (i == 0) {
@@ -125,20 +129,71 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 			System.out.println("Minimum value is " + minimumValue);
 
 			Query q = new Query();
+			
+			
+			int firstPointer = minimumValuePosition;
+			int secondPointer = minimumValuePosition;
+			
+			//Fetching the first minimumValuePosition
+			List<QueryPred> queryPrediatesForMinimumPosition = queryPredicateList
+					.get(minimumValuePosition);
+			q.addWhere(queryPrediatesForMinimumPosition.get(0));
+			q.addWhere(queryPrediatesForMinimumPosition.get(1));
+			
+			
+			while (!(firstPointer == 0 && secondPointer == result.length - 1)) {
+
+				if (firstPointer <= 0) {
+					secondPointer++;
+					List<QueryPred> queryPrediates = queryPredicateList
+							.get(secondPointer);
+					q.addWhere(queryPrediates.get(0));
+					q.addWhere(queryPrediates.get(1));
+				}
+
+				else if (secondPointer >= result.length -1) {
+					firstPointer--;
+					List<QueryPred> queryPrediates = queryPredicateList
+							.get(firstPointer);
+					q.addWhere(queryPrediates.get(0));
+					q.addWhere(queryPrediates.get(1));
+				}
+
+				else {
+					if (result[firstPointer - 1] < result[secondPointer + 1]) {
+						firstPointer--;
+						List<QueryPred> queryPrediates = queryPredicateList
+								.get(firstPointer);
+						q.addWhere(queryPrediates.get(0));
+						q.addWhere(queryPrediates.get(1));
+					} else {
+						secondPointer++;
+						List<QueryPred> queryPrediates = queryPredicateList
+								.get(secondPointer);
+						q.addWhere(queryPrediates.get(0));
+						q.addWhere(queryPrediates.get(1));
+					}
+				}
+
+			}
+			
+			System.out.println("New Query after estimation");
+			System.out.println(q.toString());
+			
+			Query q2 = new Query();
+			
 			for (int i = minimumValuePosition; i < result.length; i++) {
 				List<QueryPred> queryPredicates = queryPredicateList.get(i);
-				q.addWhere(queryPredicates.get(0));
-				q.addWhere(queryPredicates.get(1));
+				q2.addWhere(queryPredicates.get(0));
+				q2.addWhere(queryPredicates.get(1));
 			}
 
 			for (int i = minimumValuePosition - 1; i >= 0; i--) {
 				List<QueryPred> queryPredicates = queryPredicateList.get(i);
-				q.addWhere(queryPredicates.get(0));
-				q.addWhere(queryPredicates.get(1));
+				q2.addWhere(queryPredicates.get(0));
+				q2.addWhere(queryPredicates.get(1));
 			}
-			
-			System.out.println(q.toString());
-			IEJoinInMemoryP4 ieJoinP4 = new IEJoinInMemoryP4(q, true);
+			IEJoinInMemoryP4 ieJoinP4 = new IEJoinInMemoryP4(q2, true);
 			System.out.println("Num Tuples: " + ieJoinP4.getNumTuples());
 
 		} catch (Exception e) {
@@ -374,8 +429,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 public class SelectivityEstimatorTest {
 	public static void main(String argv[]) {
 
-		int[] sizeOfTables = DBBuilderP4.buildNumTuples(300);
-		
+		int[] sizeOfTables = DBBuilderP4.buildNumTuples(800);
 		boolean sortstatus = IEJoinInMemorySelectivityEstimate.runTests(sizeOfTables);
 
 	}
