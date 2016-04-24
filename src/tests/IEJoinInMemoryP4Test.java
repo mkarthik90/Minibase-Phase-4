@@ -8,9 +8,9 @@ public class IEJoinInMemoryP4Test {
 	public static void main(String[] args){
 		try {
 			//DBBuilderP4.build();
-			DBBuilderP4.buildNumTuples(100);
+			DBBuilderP4.buildNumTuples(10000);
 			//DBBuilder.build();
-			Query query = QueryParser.parse("queries/p4/query_3a.txt");
+			Query query = QueryParser.parse("queries/phase4_query.txt");
 			IEJoinInMemoryP4 test = new IEJoinInMemoryP4(query, false);
 			
 			System.out.println("Number of tuples: " + test.getNumTuples());
