@@ -176,6 +176,7 @@ public class IEJoinInMemoryP4 {
 			Tuple t;
 			int val1, val2;
 			List<Tuple> intTuples = new ArrayList<Tuple>();
+			/*
 			FileScan scan = new FileScan("intermediate.in", IEJoinInMemory.attrTypes.get("intermediate"), null, (short) IEJoinInMemory.tableColNums.get("intermediate").intValue(), (short) IEJoinInMemory.tableColNums.get("intermediate").intValue(), IEJoinInMemory.basicProjections.get("intermediate"), null);
 
 			while((t = scan.get_next()) != null){
@@ -193,17 +194,23 @@ public class IEJoinInMemoryP4 {
 
 			IEJoinInMemory.hFile = DBBuilderP4.make_new_heap("intermediate");
 
-			for(Tuple temp : intTuples){
+*/
+			List<Tuple> tempSet = new ArrayList<Tuple>();
+			
+			for(Tuple temp : IEJoinInMemory.intermediateTable){
 				val1 = temp.getIntFld(col1);
 				val2 = temp.getIntFld(col2);
 
 				if(IEJoinInMemory.evaluate(val1, op, val2)){
-					DBBuilderP4.insert_tuple(IEJoinInMemory.hFile, temp);
+					//DBBuilderP4.insert_tuple(IEJoinInMemory.hFile, temp);
+					tempSet.add(temp);
 					numTuples++;
 				}
 			}
+			
+			IEJoinInMemory.intermediateTable = tempSet;
 
-		} catch (FileScanException | TupleUtilsException | InvalidRelation | IOException | JoinsException | InvalidTupleSizeException | InvalidTypeException | PageNotReadException | PredEvalException | UnknowAttrType | FieldNumberOutOfBoundException | WrongPermat | InvalidSlotNumberException | FileAlreadyDeletedException | HFBufMgrException | HFDiskMgrException e) {
+		} catch (IOException | FieldNumberOutOfBoundException e) {
 			e.printStackTrace();
 			System.exit(0);
 		}

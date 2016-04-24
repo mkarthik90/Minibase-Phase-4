@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +25,7 @@ import parser.QueryPred;
 import tests.DBBuilderP4;
 
 public class IEJoinInMemory extends Iterator{
-
+	public static List<Tuple> intermediateTable;
 	public static Map<String, AttrType[]> attrTypes;
 	public static Map<String, FldSpec[]> basicProjections;
 	public static Map<String, Integer> tableColNums;
@@ -165,27 +166,45 @@ public class IEJoinInMemory extends Iterator{
 			}
 
 			try {
-				FileScan r1Scan = new FileScan(r1 + ".in", attrTypes.get(r1), null, (short) tableColNums.get(r1).intValue(), (short) tableColNums.get(r1).intValue(), basicProjections.get(r1), null),
-						r2Scan = new FileScan(r2 + ".in", attrTypes.get(r2), null, (short) tableColNums.get(r2).intValue(), (short) tableColNums.get(r2).intValue(), basicProjections.get(r2), null);
 				Tuple temp, tempCopy;
 
-				while((temp = r1Scan.get_next()) != null){
-					tempCopy = new Tuple();
-					tempCopy.setHdr((short) tableColNums.get(r1).intValue(), attrTypes.get(r1), null);
-					tempCopy.tupleCopy(temp);
+				if(!r1.equals("intermediate")){
+					FileScan r1Scan = new FileScan(r1 + ".in", attrTypes.get(r1), null, (short) tableColNums.get(r1).intValue(), (short) tableColNums.get(r1).intValue(), basicProjections.get(r1), null);
+					while((temp = r1Scan.get_next()) != null){
+						tempCopy = new Tuple();
+						tempCopy.setHdr((short) tableColNums.get(r1).intValue(), attrTypes.get(r1), null);
+						tempCopy.tupleCopy(temp);
 
-					_values.get(IEJoinInMemoryArrayType.L1).add(tempCopy);
-					_values.get(IEJoinInMemoryArrayType.L2).add(tempCopy);
+						_values.get(IEJoinInMemoryArrayType.L1).add(tempCopy);
+						_values.get(IEJoinInMemoryArrayType.L2).add(tempCopy);
+					}
+				}
+				else{
+					for(Tuple t : intermediateTable){
+						_values.get(IEJoinInMemoryArrayType.L1).add(t);
+						_values.get(IEJoinInMemoryArrayType.L2).add(t);
+					}
 				}
 
-				while((temp = r2Scan.get_next()) != null){
-					tempCopy = new Tuple();
-					tempCopy.setHdr((short) tableColNums.get(r2).intValue(), attrTypes.get(r2), null);
-					tempCopy.tupleCopy(temp);
+				if(!r2.equals("intermediate")){
+					FileScan r2Scan = new FileScan(r2 + ".in", attrTypes.get(r2), null, (short) tableColNums.get(r2).intValue(), (short) tableColNums.get(r2).intValue(), basicProjections.get(r2), null);
+					while((temp = r2Scan.get_next()) != null){
+						tempCopy = new Tuple();
+						tempCopy.setHdr((short) tableColNums.get(r2).intValue(), attrTypes.get(r2), null);
+						tempCopy.tupleCopy(temp);
 
-					_values.get(IEJoinInMemoryArrayType.L1Prime).add(tempCopy);
-					_values.get(IEJoinInMemoryArrayType.L2Prime).add(tempCopy);
+						_values.get(IEJoinInMemoryArrayType.L1Prime).add(tempCopy);
+						_values.get(IEJoinInMemoryArrayType.L2Prime).add(tempCopy);
+					}
 				}
+				else{
+					for(Tuple t : intermediateTable){
+						_values.get(IEJoinInMemoryArrayType.L1Prime).add(t);
+						_values.get(IEJoinInMemoryArrayType.L2Prime).add(t);
+					}
+				}
+				
+				intermediateTable = new ArrayList<Tuple>();
 			} catch (JoinsException | InvalidTupleSizeException | InvalidTypeException | PageNotReadException
 					| PredEvalException | UnknowAttrType | FieldNumberOutOfBoundException | WrongPermat
 					| IOException | FileScanException | TupleUtilsException | InvalidRelation e) {
@@ -510,19 +529,16 @@ public class IEJoinInMemory extends Iterator{
 						Projection.Join(out1, attrTypes.get(_r1), out2, attrTypes.get(_r2), outTuple, permMat, permMat.length);
 					}
 
-					/*
-					System.out.println("Tuple 1: " + out1);
-					System.out.println("Tuple 2: " + out2);
-					System.out.println("Out Tuple: " + outTuple);
-					 */
 
-					//	outTuple.print(projAttrs);
+
+
 
 					if(!saveResults){
 						outTuple.print(projAttrs);
 					}
 					else{
-						DBBuilderP4.insert_tuple(hFile, outTuple);
+						intermediateTable.add(outTuple);
+						//DBBuilderP4.insert_tuple(hFile, outTuple);
 						//hFile.insertRecord(outTuple.returnTupleByteArray());
 					}
 
@@ -533,7 +549,7 @@ public class IEJoinInMemory extends Iterator{
 			}
 		}
 
-		//System.out.println("Number of tuples: " + numTuples);
+		System.out.println("Number of tuples: " + numTuples);
 		return numTuples;
 	}
 
