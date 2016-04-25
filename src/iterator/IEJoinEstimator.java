@@ -69,7 +69,7 @@ public class IEJoinEstimator extends Iterator{
 	class IEJoinEstimatorArray{
 		private Map<IEJoinEstimatorArrayType, List<Tuple>> _values;
 		private Map<IEJoinEstimatorArrayType, List<Tuple>> _tempValues;
-		private int percentage = 10;
+		private float percentage = (float)0.2;
 		private int _l1TupleOrder, _l2TupleOrder;
 
 		public IEJoinEstimatorArray(String r1, String r2, int r1c1, int r2c1, int r1c2, int r2c2, int op1, int op2, int r1Size, int r2Size){
@@ -168,7 +168,8 @@ public class IEJoinEstimator extends Iterator{
 				int Low = 0;
 				int High = r1Size-1;
 				List<Tuple> tuples = _tempValues.get(IEJoinEstimatorArrayType.L1);
-				for(int i=0;i<r1Size/percentage;i++){
+				int totalRecordsForR1 = Math.round(r1Size * percentage);
+				for(int i=0;i<totalRecordsForR1;i++){
 					int result = r.nextInt(High-Low) + Low;
 					_values.get(IEJoinEstimatorArrayType.L1).add(tuples.get(result));
 					_values.get(IEJoinEstimatorArrayType.L2).add(tuples.get(result));
@@ -177,7 +178,8 @@ public class IEJoinEstimator extends Iterator{
 				
 				High = r2Size-1;
 				List<Tuple> tuplesSecondTable = _tempValues.get(IEJoinEstimatorArrayType.L1Prime);
-				for(int i=0;i<r2Size/percentage;i++){
+				int totalRecordsForR2 = Math.round(r2Size * percentage);
+				for(int i=0;i<totalRecordsForR2;i++){
 					int result = r.nextInt(High-Low) + Low;
 					_values.get(IEJoinEstimatorArrayType.L1Prime).add(tuplesSecondTable.get(result));
 					_values.get(IEJoinEstimatorArrayType.L2Prime).add(tuplesSecondTable.get(result));

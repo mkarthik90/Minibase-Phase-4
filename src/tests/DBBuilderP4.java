@@ -1516,7 +1516,7 @@ public class DBBuilderP4 implements GlobalConst{
 		RTable3 = new ArrayList<TableEntry3>();
 		RTable4 = new ArrayList<TableEntry4>();
 		RTable5 = new ArrayList<TableEntry5>();
-		String fndb = "datasetsPhase4/";
+		String fndb = "datasetsPhase4/Original/";
 		String line;
 		String parts[];
 		int r1 = 0;
