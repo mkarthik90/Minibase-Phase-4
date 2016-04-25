@@ -603,7 +603,7 @@ public class DBBuilderP4 implements GlobalConst{
 		return sizes;
 	}
 	
-	public static Histogram[] build_sample()
+	public static Histogram[] build_sorted(int max)
 	{
 		RTable1 = new ArrayList<TableEntry1>();
 		RTable2 = new ArrayList<TableEntry2>();
@@ -632,7 +632,8 @@ public class DBBuilderP4 implements GlobalConst{
 		try{
 			FileReader fr = new FileReader(fndb + fn1 + ".csv");
 			BufferedReader bufferedReader = new BufferedReader(fr);
-			while((line = bufferedReader.readLine()) != null) 
+			int i = 0;
+			while((line = bufferedReader.readLine()) != null && i < max) 
 			{
 				parts = line.split(",");
 				r1 = Integer.parseInt(parts[0]);
@@ -641,6 +642,7 @@ public class DBBuilderP4 implements GlobalConst{
 				r4 = Integer.parseInt(parts[3]);
 				te1 = new TableEntry1(r1,r2,r3,r4);
 				RTable1.add(te1);
+				i++;
 			}
 			bufferedReader.close();
 		}
@@ -728,7 +730,8 @@ public class DBBuilderP4 implements GlobalConst{
 		try{
 			FileReader fr = new FileReader(fndb + fn2 + ".csv");
 			BufferedReader bufferedReader = new BufferedReader(fr);
-			while((line = bufferedReader.readLine()) != null) 
+			int i = 0;
+			while((line = bufferedReader.readLine()) != null && i < max) 
 			{
 				parts = line.split(",");
 				r1 = Integer.parseInt(parts[0]);
@@ -740,6 +743,7 @@ public class DBBuilderP4 implements GlobalConst{
 				r7 = Integer.parseInt(parts[6]);
 				te2 = new TableEntry2(r1,r2,r3,r4,r5,r6,r7);
 				RTable2.add(te2);
+				i++;
 			}
 			bufferedReader.close();
 		}
@@ -809,7 +813,8 @@ public class DBBuilderP4 implements GlobalConst{
 		try{
 			FileReader fr = new FileReader(fndb + fn3 + ".csv");
 			BufferedReader bufferedReader = new BufferedReader(fr);
-			while((line = bufferedReader.readLine()) != null) 
+			int i = 0;
+			while((line = bufferedReader.readLine()) != null && i < max) 
 			{
 				parts = line.split(",");
 				r1 = Integer.parseInt(parts[0]);
@@ -821,6 +826,7 @@ public class DBBuilderP4 implements GlobalConst{
 				r7 = Integer.parseInt(parts[6]);
 				te3 = new TableEntry3(r1,r2,r3,r4,r5,r6,r7);
 				RTable3.add(te3);
+				i++;
 			}
 			bufferedReader.close();
 		}
@@ -891,7 +897,8 @@ public class DBBuilderP4 implements GlobalConst{
 		try{
 			FileReader fr = new FileReader(fndb + fn4 + ".csv");
 			BufferedReader bufferedReader = new BufferedReader(fr);
-			while((line = bufferedReader.readLine()) != null) 
+			int i = 0;
+			while((line = bufferedReader.readLine()) != null && i < max) 
 			{
 				parts = line.split(",");
 				r1 = Integer.parseInt(parts[0]);
@@ -903,6 +910,7 @@ public class DBBuilderP4 implements GlobalConst{
 				r7 = Integer.parseInt(parts[6]);
 				te4 = new TableEntry4(r1,r2,r3,r4,r5,r6,r7);
 				RTable4.add(te4);
+				i++;
 			}
 			bufferedReader.close();
 		}
@@ -972,7 +980,8 @@ public class DBBuilderP4 implements GlobalConst{
 		try{
 			FileReader fr = new FileReader(fndb + fn5 + ".csv");
 			BufferedReader bufferedReader = new BufferedReader(fr);
-			while((line = bufferedReader.readLine()) != null) 
+			int i = 0;
+			while((line = bufferedReader.readLine()) != null && i < max) 
 			{
 				parts = line.split(",");
 				r1 = Integer.parseInt(parts[0]);
@@ -980,6 +989,7 @@ public class DBBuilderP4 implements GlobalConst{
 				r3 = Integer.parseInt(parts[2]);
 				te5 = new TableEntry5(r1,r2,r3);
 				RTable5.add(te5);
+				i++;
 			}
 			bufferedReader.close();
 		}
@@ -1048,11 +1058,11 @@ public class DBBuilderP4 implements GlobalConst{
 		hist[3] = new Histogram(RTable4.size(), 7, Histogram.SAMPLE);
 		hist[4] = new Histogram(RTable5.size(), 3, Histogram.SAMPLE);
 
-		hist[0].build_sample_hist(RTable1, 1);
-		hist[1].build_sample_hist(RTable2, 2);
-		hist[2].build_sample_hist(RTable3, 3);
-		hist[3].build_sample_hist(RTable4, 4);
-		hist[4].build_sample_hist(RTable5, 5);
+		hist[0].build_sorted_hist(RTable1, 1);
+		hist[1].build_sorted_hist(RTable2, 2);
+		hist[2].build_sorted_hist(RTable3, 3);
+		hist[3].build_sorted_hist(RTable4, 4);
+		hist[4].build_sorted_hist(RTable5, 5);
 		
 		return hist;
 	}

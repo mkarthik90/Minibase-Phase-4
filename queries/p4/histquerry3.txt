@@ -1,0 +1,5 @@
+count(*)
+From F4 F5
+F5_2 1 F4_1
+AND
+F4_2 1 F5_1
