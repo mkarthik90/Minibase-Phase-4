@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -203,7 +202,7 @@ public class IEJoinInMemory extends Iterator{
 						_values.get(IEJoinInMemoryArrayType.L2Prime).add(t);
 					}
 				}
-				
+
 				intermediateTable = new ArrayList<Tuple>();
 			} catch (JoinsException | InvalidTupleSizeException | InvalidTypeException | PageNotReadException
 					| PredEvalException | UnknowAttrType | FieldNumberOutOfBoundException | WrongPermat
@@ -557,17 +556,16 @@ public class IEJoinInMemory extends Iterator{
 		Set<Integer> r1Set, r2Set;
 		int keyCol;
 
-		for(int i = 0; i < out.noOfFlds(); i++){
-			out.setIntFld(i+1, Integer.MIN_VALUE);
-		}
-
 		if(_r1.equals("intermediate")){
+			out.tupleCopy(t1);
+			/*
 			for(String table : _projRels.keySet()){
 				for(Integer col : _projRels.get(table)){
 					keyCol = IEJoinInMemoryP4.getIntCol(table, col);
 					out.setIntFld(keyCol, t1.getIntFld(keyCol));
 				}
 			}
+			*/
 		}
 		else{
 			r1Set = _projRels.get(_r1);
