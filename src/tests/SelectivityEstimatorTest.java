@@ -194,6 +194,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 				q2.addWhere(queryPredicates.get(0));
 				q2.addWhere(queryPredicates.get(1));
 			}
+			
 			IEJoinInMemoryP4 ieJoinP4 = new IEJoinInMemoryP4(q2, true);
 			System.out.println("Num Tuples: " + ieJoinP4.getNumTuples());
 			long endTime = System.currentTimeMillis();
@@ -433,7 +434,7 @@ class IEJoinInMemorySelectivityEstimate implements GlobalConst {
 public class SelectivityEstimatorTest {
 	public static void main(String argv[]) {
 
-		int[] sizeOfTables = DBBuilderP4.buildNumTuples(10000);
+		int[] sizeOfTables = DBBuilderP4.buildNumTuples(1000);
 		boolean sortstatus = IEJoinInMemorySelectivityEstimate.runTests(sizeOfTables);
 
 	}
